@@ -1,0 +1,18 @@
+{% load static %}
+<!doctype html>
+<html>
+<head>
+    <title>Soccer Hours</title>
+    <link rel = "stylesheet" type = "text/css" href="{% static 'css/main.css' %}" />
+</head>
+<!-- <h1>Soccer Hours</h1> -->
+<br>
+<h2>SOCCER HOURS</h2>
+<br>
+<h3>ADMIN add venue</h3>
+<br><br><br>
+<form method='POST'>{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" name="addvenue" value="Add Venue" />
+</form>
+</html>

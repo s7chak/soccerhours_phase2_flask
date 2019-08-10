@@ -1,0 +1,31 @@
+{% load static %}
+<!doctype html>
+
+<html>
+<head>
+	<title>Soccer Hours</title>
+	<link rel = "stylesheet" type = "text/css" href="{% static 'css/main.css' %}" />
+</head>
+<!-- <h1>Soccer Hours</h1> -->
+<br>
+<h2>Venues Available for given Date and Slot</h3>
+
+<br><br><br>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Play!</th>
+    </tr>
+    {% for venue in venues %}
+    <tr> 
+        <td>{{ venue.0 }}</td>
+        <td>{{ venue.1 }}</td>
+        <td><button class="button btn-primary" onclick="location.href={% url 'startevent'%}" id={{venue.0}}>Start Your Event Here</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+</html>

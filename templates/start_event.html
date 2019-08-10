@@ -1,0 +1,16 @@
+{% load static %}
+
+<!doctype html>
+<html>
+<head>
+	<title>Soccer Hours</title>
+	<link rel = "stylesheet" type = "text/css" href="{% static 'css/main.css' %}" />
+</head>
+<h1 align="center">Start Your Own Event</h1><br><br><br>
+<h3 align="center">Enter details for the event:</h3>
+<br>
+<form method='POST'>{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" name="startevent" value="Save Event" />
+</form>
+</html>
