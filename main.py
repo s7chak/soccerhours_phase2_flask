@@ -1,10 +1,11 @@
 # [START gae_python37_cloudsql_mysql]
 import os
 
-from flask import Flask, render_template, url_for, redirect, flash, jsonify, request
-from forms import SignUpForm, LoginForm, SlotDateSearchForm, ZipSearchForm, VenueDateForm
+from flask import Flask, render_template, url_for, redirect, flash, jsonify, request, session
+from forms import SignUpForm, LoginForm, SlotDateSearchForm, ZipSearchForm, VenueDateForm, StartEventForm
 import pymysql
 from func.mainfunctions import MainFunctions
+from func.commonfunctions import CommonFunctions
 
 
 db_user = os.environ.get('CLOUD_SQL_USERNAME')
@@ -24,12 +25,17 @@ def welcome():
 
 @app.route("/home")
 def home():
-    return render_template("home.html")
+    return render_template("home.html", admin=session['admin'])
 
 @app.route("/admin")
 def admin():
-    return render_template("admin.html")
-    
+    if 'admin' in session:
+        if session['admin'] == 'A':
+            return render_template("admin.html")
+        else:
+            return "<h2>Sorry, you are not an admin user at Soccer Hours</h2>"
+    else:
+        return render_template('user_login.html', title='Login')
 
 @app.route("/login", methods=['GET','POST'])
 def login():
@@ -49,7 +55,10 @@ def login():
                 # request.session['userstatus']=result[2]
                 print(result[1], result[2])
                 if result[2]!='I':
-                    userid=result[3]
+                    session['userid']=result[3]
+                    session['admin']=result[1]
+                    session['username']=result[4]
+                    print("Logged in : "+result[4])
                     if result[1]=='A':
                         userdetail['admin']=True
                     else:
@@ -93,13 +102,35 @@ def zipsearch():
         return render_template('display_venues.html', list=venuelist)
     return render_template("zip_search.html", title="SearchZip", form=form)
 
+# Start an Event
+@app.route("/startevent", methods=['GET','POST'])
+def startevent():
+    form = StartEventForm()
+    func = CommonFunctions()
+    venuelist = func.get_all_venues()
+    print("Startevent Body")
+    if form.validate_on_submit():
+        print("submitted")
+        print(session['username'])
+        mainfunc = MainFunctions()
+        data = {}
+        data['venueid'] = request.form['venue']
+        data['username'] = session['username']
+        data['eventname'] = form.eventname.data
+        data['eventdesc'] = form.eventdesc.data
+        data['eventdate'] = form.eventdate.data
+        data['starttime'] = form.starttime.data
+        data['endtime'] = form.endtime.data
+        data['eventcapacity'] = form.eventcapacity.data
+        data['genderoption'] = form.genderoption.data
+        result = mainfunc.start_event(data)
+        if result[0]==0:
+            return '<h2>'+result[1]+'</h2>'
+        else:
+            flash(f'Event: {form.eventname.data} has been started!', 'success')
+            return redirect(url_for('home'))
+    return render_template("start_event.html", title="Start Event", form=form, list=venuelist)
 
-# @app.route("/venues", methods=['GET','POST'])
-# def venues():
-#    if request.method=='POST':
-#       print(request.form['venue'])
-#       return redirect(url_for('venues'))
-#    return render_template("display_venues.html", title="Venues")
 
 
 @app.route("/venueevents", methods=['GET','POST'])
@@ -118,8 +149,8 @@ def venueevents():
 def joinevent():
     func = MainFunctions()
     eventid=request.form['eventid']
-    func.user_joins_event(userid,eventid)
-    return render_template("success_joined.html", title="Event Joined")
+    message = func.user_joins_event(session['userid'],eventid)
+    return render_template("success_joined.html", title="Event Joined", message=message)
 
 
 

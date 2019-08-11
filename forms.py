@@ -36,7 +36,19 @@ class VenueDateForm(FlaskForm):
 	eventdate = StringField('Date', validators=[DataRequired()],render_kw={"placeholder": "Enter date"})
 	submit = SubmitField('Search Events')
 
-# class StartEventForm():
+
+class StartEventForm(FlaskForm):
+	venueid = IntegerField()
+	eventname = StringField('Event Name', validators=[DataRequired()])
+	eventdesc = StringField('Event Description')
+	eventdate = StringField('Date (YYYY-MM-DD)', validators=[DataRequired()])
+	genderoption = StringField('Specify a Gender?(optional)')
+	starttime = IntegerField('Start Time(24-Hr)', validators=[DataRequired()])
+	endtime = IntegerField('End Time(24-Hr)', validators=[DataRequired()])
+	eventcapacity = IntegerField('Number of players', validators=[DataRequired()])
+	submit = SubmitField('Start Event')
+
+
 	# c=common()
 	# venuelist=c.get_all_venues()
 	# venues=forms.ChoiceField(choices=venuelist)

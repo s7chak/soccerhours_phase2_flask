@@ -1,15 +1,124 @@
 {% extends "layout.html" %}
-<!doctype html>
-<html>
-<head>
-	<title>Soccer Hours</title>
-	<link rel = "stylesheet" type = "text/css" href="{% static 'css/main.css' %}" />
-</head>
-<h1 align="center">Start Your Own Event</h1><br><br><br>
-<h3 align="center">Enter details for the event:</h3>
-<br>
-<form method='POST'>{% csrf_token %}
-{{ form.as_p }}
-<input type="submit" name="startevent" value="Save Event" />
-</form>
-</html>
+{% block content %}
+<div class="content-section">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Start Your Own Event</legend>
+
+                <div class="form-group">
+				      <dl>
+				        <dt>Choose a Venue:
+				        <dd><select name="venue">
+						{% for venue in list %}
+						<option value="{{ venue[0] }}">{{ venue[1] }}</option>
+						{% endfor %}
+				        </select>
+				        <br><br>
+				      </dl>
+				</dd>
+                    <div class="form-group">
+                    {{ form.eventname.label(class="form-control-label") }}
+
+                    {% if form.eventname.errors %}
+                        {{ form.eventname(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.eventname.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.eventname(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.eventdesc.label(class="form-control-label") }}
+
+                    {% if form.eventdesc.errors %}
+                        {{ form.eventdesc(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.eventdesc.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.eventdesc(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.eventdate.label(class="form-control-label") }}
+
+                    {% if form.eventdate.errors %}
+                        {{ form.eventdate(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.eventdate.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.eventdate(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.starttime.label(class="form-control-label") }}
+
+                    {% if form.starttime.errors %}
+                        {{ form.starttime(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.starttime.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.starttime(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.endtime.label(class="form-control-label") }}
+                    {% if form.endtime.errors %}
+                        {{ form.endtime(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.endtime.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.endtime(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.genderoption.label(class="form-control-label") }}
+                    {% if form.genderoption.errors %}
+                        {{ form.genderoption(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.genderoption.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.genderoption(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>                
+                
+                <div class="form-group">
+                    {{ form.eventcapacity.label(class="form-control-label") }}
+                    {% if form.eventcapacity.errors %}
+                        {{ form.eventcapacity(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.eventcapacity.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.eventcapacity(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+            </fieldset>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
+{% endblock content %}

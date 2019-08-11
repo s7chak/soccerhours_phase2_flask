@@ -192,7 +192,7 @@ class CommonFunctions():
     def check_valid_venue(self,venueid):
         connection = self.db_connection()
         with connection.cursor() as cursor:
-            cursor.execute(''' Select pk_venue_id from venue where pk_venue_id=? ''',(venueid,))
+            cursor.execute(''' Select pk_venue_id from venue where pk_venue_id=%s ''',[venueid])
             venue=cursor.fetchone()
             if venue:
                 return True
@@ -205,7 +205,7 @@ class CommonFunctions():
     def check_valid_event(self,eventid):
         connection = self.db_connection()
         with connection.cursor() as cursor:
-            cursor.execute(''' Select pk_event_id from events where pk_event_id=? ''',(eventid,))
+            cursor.execute(''' Select pk_event_id from events where pk_event_id=%s ''',[eventid])
             event=cursor.fetchone()
             if(event!=None):
                 return True
@@ -228,7 +228,7 @@ class CommonFunctions():
     def get_all_venues(self):
         connection = self.db_connection()
         with connection.cursor() as cursor:
-            cursor.execute(''' Select venue_id, venue_name from venue ''')
+            cursor.execute(''' Select pk_venue_id, venue_name from venue ''')
             return cursor.fetchall()
 
 

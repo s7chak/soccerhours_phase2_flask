@@ -66,7 +66,7 @@ class MainFunctions():
 
 			connection.close()
 			if user == username and passw == password:
-				return [1,row[2],row[3], row[4]]
+				return [1,row[2],row[3], row[4], row[0]]
 			else:
 				return [0]
 
@@ -122,32 +122,34 @@ class MainFunctions():
 			if(datestatus=='G' or datestatus=='T'):
 				if(datestatus=='T' and ~c.check_valid_time_today(starttime)):
 					print("For today time(Hour) needs to be greater than now. Please retry.")
-					return
+					return (0,"For today time(Hour) needs to be greater than now. Please retry.")
 				else:	
 					# Check if entries exist in Slots
 					slotspresent = c.check_venue_slots(venueid, eventdate)
-					if slotspresent=='N':
-						print("Inserting...")
-						for i in range(13):
-							cursor.execute(''' INSERT INTO slots VALUES(%s+1,%s,%s,'A') ''',(i,venueid,eventdate))		
 					if(c.check_slots_booked(venueid, eventdate, slotids)):
 						print("The entered slot(s) are already booked.")
 						return (0,"The entered slot(s) are already booked.")
+					if slotspresent=='N':
+						print("Inserting...")
+						for i in range(13):
+							cursor.execute(''' INSERT INTO slots VALUES(%s+1,%s,%s,'A',%s) ''',[i,venueid,eventdate,eventid])
+							connection.commit()
 					for i in slotids:
-						cursor.execute(''' Update slots set availability='U' where venue_id=%s and slot_id=%s ''',(venueid,i))
+						cursor.execute(''' Update slots set availability='U', event_id=%s where venue_id=%s and slot_id=%s and date=%s''',[eventid,venueid,i,eventdate])
 					
 					cursor.execute(''' SELECT pk_user_id from user where username= %s ''',[username])
-					useridresult=cursor.fetchone()
+					useridresult = cursor.fetchone()
 					if useridresult:
-						userid=useridresult[0]
+						userid = useridresult[0]
 					else:
 						return (0,"User ID not found for user:"+username)
-					cursor.execute(''' INSERT INTO events(pk_event_id,event_name,event_desc,event_date,start_time,end_time,user_id,venue_id,event_capacity,event_status,members_joined,gender_option) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,'A',1,%s) ''',(eventid,eventname,eventdesc,eventdate,starttime,endtime,userid,venueid,eventcapacity,genderoption))
+					cursor.execute(''' INSERT INTO events(pk_event_id,event_name,event_desc,event_date,start_time,end_time,user_id,venue_id,event_capacity,event_status,members_joined,gender_option) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,'A',1,%s) ''',[eventid,eventname,eventdesc,eventdate,starttime,endtime,userid,venueid,eventcapacity,genderoption])
 					cursor.execute(''' UPDATE sqlite_sequence set seq=seq+1 where name='events' ''')
 					# Insert entry in event_members
-					cursor.execute(''' INSERT INTO event_members VALUES(%s,%s) ''',(eventid,userid))
+					cursor.execute(''' INSERT INTO event_members VALUES(%s,%s) ''',[eventid,userid])
+					connection.commit()
 					print("Slots booked for time:",starttime,":00  to ",endtime,":00  on date:",eventdate," for Venue ID:",venueid)
-					return " ".join(["Slots booked for time:",starttime,":00  to ",endtime,":00  on date:",eventdate," for Venue ID:",venueid])
+					return (1," ".join(["Slots booked for time:",str(starttime),":00  to ",str(endtime),":00  on date:",eventdate," for Venue ID:",str(venueid)]))
 			else:
 				print("The provided date has passed. Unable to book event for past date.")
 			
@@ -162,24 +164,26 @@ class MainFunctions():
 		with connection.cursor() as cursor:
 			c = common()
 			if c.check_valid_user(userid) is False:
-				print("Invalid UserID.")
-				return
+				print("Invalid UserID."+str(userid))
+				return "Invalid UserID."
 			if c.check_valid_event(eventid) is False:
 				print("Invalid EventID.")
-				return
+				return "Invalid Event."
 			
-			cursor.execute(''' Select event_capacity, members_joined from events where pk_event_id=? ''', (eventid,))
+			cursor.execute(''' Select event_capacity, members_joined from events where pk_event_id=%s ''', [eventid])
 			eventroom=cursor.fetchone()
 
 			if eventroom[0]>eventroom[1]:
 				# Update Events table
-				cursor.execute(''' Update events set members_joined=members_joined+1 where pk_event_id=? ''', (eventid,))
+				cursor.execute(''' Update events set members_joined=members_joined+1 where pk_event_id=%s ''', [eventid])
 
 				# Update EventMembers table
-				cursor.execute(''' INSERT INTO event_members values (?,?) ''',(eventid, userid))
+				cursor.execute(''' INSERT INTO event_members values (%s,%s) ''',[eventid, userid])
+				connection.commit()
 				print("UserID: {0} has joined event: {1}".format(userid,eventid))
+				return "You have joined an event."
 			else:
-				return "Event is full"
+				return "Sorry, but the event is full"
 
 			connection.close()
 
@@ -253,6 +257,14 @@ class MainFunctions():
 
 
 
+	def deactivate_user(self, user_id):
+		connection = self.db_connection()
+		with connection.cursor() as cursor:
+			
+			query='''UPDATE user SET user_status='U' WHERE pk_user_id=%s'''
+			cursor.execute(query, user_id)
+			
+			connection.close()
 
 
 

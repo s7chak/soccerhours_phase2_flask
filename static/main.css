@@ -1,4 +1,11 @@
 @import 'https://fonts.googleapis.com/css?family=Montserrat:300,400,700';
+/*.bg { 
+  /* The image used */
+  background-image: url("https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/7bd2f4fc-1c76-4bf6-999f-e85e1d631ee2/dbwvgvz-d9ee67d5-bdd2-40b8-b3b8-bf1ea9eff2a8.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzdiZDJmNGZjLTFjNzYtNGJmNi05OTlmLWU4NWUxZDYzMWVlMlwvZGJ3dmd2ei1kOWVlNjdkNS1iZGQyLTQwYjgtYjNiOC1iZjFlYTllZmYyYTguanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.WBX1z9GtiCGEaOcoae9oVrIqcqwZT7AsYaUPBhhz_84");
+  max-width: 100%;
+  max-height: 100vh;
+  margin: auto;
+}*/
 body {
   background: #fafafa;
   color: #333333;
@@ -79,66 +86,6 @@ a.article-title:hover {
 .account-heading {
   font-size: 2.5rem;
 }
-
-.rwd-table {
-  margin: 1em 0;
-  min-width: 300px; // adjust to your needs
-  
-  tr {
-    border-top: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  th {
-    display: none; // for accessibility, use a visually hidden method here instead! Thanks, reddit!   
-  }
-  
-  td {
-    display: block; 
-    
-    &:first-child {
-      padding-top: .5em;
-    }
-    &:last-child {
-      padding-bottom: .5em;
-    }
-
-    &:before {
-      content: attr(data-th)": "; // who knew you could do this? The internet, that's who.
-      font-weight: bold;
-
-      // optional stuff to make it look nicer
-      width: 6.5em; // magic number :( adjust according to your own content
-      display: inline-block;
-      // end options
-      
-      @media (min-width: $breakpoint-alpha) {
-        display: none;
-      }
-    }
-  }
-  
-  th, td {
-    text-align: left;
-    
-    @media (min-width: $breakpoint-alpha) {
-      display: table-cell;
-      padding: .25em .5em;
-      
-      &:first-child {
-        padding-left: 0;
-      }
-      
-      &:last-child {
-        padding-right: 0;
-      }
-    }
-
-  }
-  
-  
-}
-
 
 .rwd-table {
   background: #34495E;
