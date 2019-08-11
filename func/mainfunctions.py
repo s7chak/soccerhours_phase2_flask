@@ -222,15 +222,10 @@ class MainFunctions():
 	def display_events_for_zipcode(self, zipcode) :
 		connection = self.db_connection()
 		with connection.cursor() as cursor:
-			query1='SELECT e.event_name, e.event_date, v.venue_name, e.start_time, e.end_time FROM events e JOIN venue v ON e.venue_id=v.pk_venue_id WHERE venue_id IN (SELECT pk_venue_id from venue where venue_zip_code = %s)' %zipcode
+			query1='SELECT e.event_name, e.event_date, v.venue_name, e.start_time, e.end_time, e.pk_event_id FROM events e JOIN venue v ON e.venue_id=v.pk_venue_id WHERE venue_id IN (SELECT pk_venue_id from venue where venue_zip_code = %s)' %zipcode
 			cursor.execute(query1)
 			venuesforzipcode=cursor.fetchall()
-			if (venuesforzipcode is not None):
-				for venue in venuesforzipcode:
-					 print("\n\nEvent Name:",venue[0],"\nEvent Date:",venue[1], "\nVenue Name:", venue[2], "\nEvent Timings:",venue[3], ":00 to ", venue[4], ":00\n")
-				else:
-					 print("\nZip Code does exist")
-			connection.close()
+
 			return venuesforzipcode
 		
 
@@ -238,15 +233,26 @@ class MainFunctions():
 	def display_events_for_venue_id(self, venue_id) :
 		connection = self.db_connection()
 		with connection.cursor() as cursor:
-			query1='SELECT e.event_name, e.event_date, v.venue_name, e.start_time, e.end_time FROM events e JOIN venue v ON e.venue_id=v.pk_venue_id WHERE venue_id = %s'
-			cursor.execute(query1)
+			query='SELECT  e.event_date, e.event_name, v.venue_name, e.start_time, e.end_time, e.pk_event_id FROM events e JOIN venue v ON e.venue_id=v.pk_venue_id WHERE venue_id = %s'
+			cursor.execute(query, venue_id)
 			eventlist=cursor.fetchall()
-			if (eventlist is not None):
-				for event in eventlist:
-					 print("\n\nEvent Name:",event[0],"\nEvent Date:",event[1], "\nVenue Name:", event[2], "\nEvent Timings:",event[3], ":00 to ", event[4], ":00\n")
-				else:
-					 print("\nZip Code does exist")
+			response=list()
+			for event in eventlist:
+				date_time = event[0].strftime("%m-%d-%Y")
+				response.append(date_time)
+				response.append(event[1])
+				response.append(event[2])
+				response.append(str(event[3])+":00")
+				response.append(str(event[4])+":00")
+				
 			connection.close()
-			return eventlist
+			if (eventlist is not None):
+				return (1,eventlist)
+			else:
+				return (0,"No events at selected venue.")
+
+
+
+
 
 

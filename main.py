@@ -1,7 +1,7 @@
 # [START gae_python37_cloudsql_mysql]
 import os
 
-from flask import Flask, render_template, url_for, redirect, flash
+from flask import Flask, render_template, url_for, redirect, flash, jsonify, request
 from forms import SignUpForm, LoginForm, SlotDateSearchForm, ZipSearchForm, VenueDateForm
 import pymysql
 from func.mainfunctions import MainFunctions
@@ -15,6 +15,8 @@ db_connection_name = os.environ.get('CLOUD_SQL_CONNECTION_NAME')
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '294d86e9fd5e4b179261796459238269'
 userid=0
+venueid=0
+eventid=0
 
 @app.route("/")
 def welcome():
@@ -23,6 +25,10 @@ def welcome():
 @app.route("/home")
 def home():
     return render_template("home.html")
+
+@app.route("/admin")
+def admin():
+    return render_template("admin.html")
     
 
 @app.route("/login", methods=['GET','POST'])
@@ -83,33 +89,45 @@ def zipsearch():
     if form.validate_on_submit():
         func = MainFunctions()
         venuelist = func.get_venues_for_zipcode(form.zipcode.data)
-        print(venuelist)
+        # return redirect(url_for('venues', list=venuelist))
         return render_template('display_venues.html', list=venuelist)
     return render_template("zip_search.html", title="SearchZip", form=form)
 
 
-@app.route("/venues", methods=['GET','POST'])
-def venues():
-    if form.validate_on_submit():
-        func = MainFunctions()
-        venuelist = func.get_venues_for_zipcode(form.zipcode.data)
-        return redirect(url_for('venues'))
-    return render_template("zip_search.html", title="Venues")
+# @app.route("/venues", methods=['GET','POST'])
+# def venues():
+#    if request.method=='POST':
+#       print(request.form['venue'])
+#       return redirect(url_for('venues'))
+#    return render_template("display_venues.html", title="Venues")
 
 
 @app.route("/venueevents", methods=['GET','POST'])
-def venueevents(venue):
+def venueevents():
     func = MainFunctions()
-    eventlist = func.display_events_for_venue_id(venueid)
-    return render_template("venue_events.html", title="VenueEvents", list=eventlist)
+    print(request.form['venue'])
+    result = func.display_events_for_venue_id(request.form['venue'])
+    print(result[1])
+    if(result[0] == 1):
+        return render_template("venue_events.html", title="VenueEvents", list=result[1])
+    else:
+        return "<h2>"+result[1]+"</h2>"
 
 
 @app.route("/joinevent", methods=['GET','POST'])
-def joinevent(eventid):
+def joinevent():
     func = MainFunctions()
+    eventid=request.form['eventid']
     func.user_joins_event(userid,eventid)
-    return render_template("venue_events.html", title="VenueEvents", list=eventlist)
+    return render_template("success_joined.html", title="Event Joined")
 
+
+
+@app.route("/joinedevents", methods=['GET','POST'])
+def joinedgames():
+    func = MainFunctions()
+    # func.user_joins_event(userid,eventid)
+    return render_template("joined_events.html", title="Joined Games")
 
 
 @app.route('/now')

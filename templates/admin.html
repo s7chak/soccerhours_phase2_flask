@@ -37,12 +37,15 @@
 	  </nav>
 	</header>
 <h3 align="center">Join Games Near You</h3>
+{% if admin %}
+<button class="button btn-primary" onclick="">Admin</button>
+{% endif %}
 <br><br><br><br>
 <body>
 <div align="center">
-	<button class="button btn-primary" onclick="window.location.href='{{ url_for( 'zipsearch') }}';">Find a Game near You</button>
-	<button class="button btn-primary" href="/login">Start your Event</button>
-	<button class="button btn-primary" href="/login">Find Slots at your Venue</button>
+	<button class="button btn-primary" onclick="window.location.href='{{ url_for( 'zipsearch' , table='Y' ) }}';">Edit a Game</button>
+	<button class="button btn-primary" href="/login">Start an Event</button>
+	<button class="button btn-primary" href="/login">Edit User access</button>
 </div>
 
 <br>
