@@ -25,19 +25,19 @@
 
 <html>
 <body>
-     <table class="rwd-table">
+     <table>
          <tbody>
         <tr>
-        <td>Name</td>
+        <td>Event Name</td>
         <td>Address</td>
         <td>See events</td>
         </tr>
-         {% for venue in list %}
-             <tr><td>{{ venue[0] }}</td>
-                <td>{{ venue[1] }} </td> 
-                <td><form action="{{ url_for('venueevents',venueid=venue) }}" method="POST">
-                        <input id="{{venue[3]}}" name="venueId" type="hidden" value="Event">
-                        <button type="submit">Check it out</button>
+         {% for event in eventlist %}
+             <tr><td>{{ event[0] }}</td>
+                <td>{{ event[1] }} </td> 
+                <td><form action="{{ url_for('joinevent', eventid=event[3]) }}" method="POST">
+                        <input id="{{event[3]}}" name="eventID" type="hidden" value="{{event[3]}}">
+                        <button type="submit"> Check It Out </button>
                     </form>
                 </td>
             </tr>

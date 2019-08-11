@@ -3,8 +3,7 @@ from wtforms import StringField, BooleanField, PasswordField, SubmitField, Integ
 from wtforms.validators import *
 
 class LoginForm(FlaskForm):
-    username = StringField('User Name',
-                        validators=[DataRequired()])
+    username = StringField('User Name', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
@@ -22,14 +21,20 @@ class SignUpForm(FlaskForm):
 	confirm_password = PasswordField('Confirm Password', validators=[DataRequired()])
 	submit = SubmitField('Sign Up')
 
+class ZipSearchForm(FlaskForm):
+	zipcode = IntegerField('Zip Code', validators=[DataRequired()])
+	submit = SubmitField('Search this area')
 
+class SlotDateSearchForm(FlaskForm):
+	starttime = IntegerField('Start Time(24-hr clock)', validators=[DataRequired()])
+	zipcode = IntegerField('End Time(24-hr clock)', validators=[DataRequired()])
+	eventdate = StringField('Date', validators=[DataRequired()])
+	submit = SubmitField('Search Events')
 
-# class SlotDateSearchForm():
-	# class Meta:
-	# 	model = Events
-	# 	fields={
-	# 		"eventdate","starttime","endtime"
-	# 	}
+class VenueDateForm(FlaskForm):
+	zipcode = IntegerField('Zip Code', validators=[DataRequired()])
+	eventdate = StringField('Date', validators=[DataRequired()])
+	submit = SubmitField('Search Events')
 
 # class StartEventForm():
 	# c=common()

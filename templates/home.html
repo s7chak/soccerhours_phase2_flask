@@ -1,14 +1,20 @@
 <!doctype html>
-
 <html>
 <head>
-	<title>Soccer Hours</title>
-	<meta charset="utf-8">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='main.css') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+
+    {% if title %}
+        <title>Soccer Hours - {{ title }}</title>
+    {% else %}
+        <title>Soccer Hours</title>
+    {% endif %}
 </head>
 	<header class="site-header">
 	  <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
@@ -37,7 +43,7 @@
 <br><br><br><br>
 <body>
 <div>
-	&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<button class="button btn-primary" href="/login">Find a Game near You</button>
+	&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<button class="button btn-primary" onclick="window.location.href='{{ url_for( 'zipsearch' , table='Y' ) }}';">Find a Game near You</button>
 	<button class="button btn-primary" href="/login">Start your Event</button>
 	<button class="button btn-primary" href="/login">Find Slots at your Venue</button>
 </div>

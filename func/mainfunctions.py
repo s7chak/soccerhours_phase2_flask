@@ -56,7 +56,7 @@ class MainFunctions():
 			password=userdata['password']
 			print(username)
 
-			cursor.execute('SELECT username, user_password, admin_status, user_status from user where username=%s',[username])
+			cursor.execute('SELECT username, user_password, admin_status, user_status, pk_user_id from user where username=%s',[username])
 			row = cursor.fetchone()
 			if row != None:
 				user=row[0]
@@ -66,12 +66,13 @@ class MainFunctions():
 
 			connection.close()
 			if user == username and passw == password:
-				return [1,row[2],row[3]]
+				return [1,row[2],row[3], row[4]]
 			else:
 				return [0]
 
 
 	def get_venues_for_slot(self,starttime, endtime, date):
+		connection = self.db_connection()
 		with connection.cursor() as cursor:
 			c = common()
 			if c.check_start_end_time(starttime,'S') and c.check_start_end_time(endtime,'E'):
@@ -94,6 +95,7 @@ class MainFunctions():
 
 	# Adds the New Event by inserting into table 'events'
 	def start_event(self,eventdata) :
+		connection = self.db_connection()
 		with connection.cursor() as cursor:
 			c = common()
 			venueid=eventdata['venueid']
@@ -156,6 +158,7 @@ class MainFunctions():
 
 
 	def user_joins_event(self,userid, eventid) :
+		connection = self.db_connection()
 		with connection.cursor() as cursor:
 			c = common()
 			if c.check_valid_user(userid) is False:
@@ -185,13 +188,11 @@ class MainFunctions():
 
 
 	def get_venues_for_zipcode(self,zipcode):
+		connection = self.db_connection()
 		with connection.cursor() as cursor:
-			query='SELECT e.event_name, e.event_date, v.venue_name, e.start_time, e.end_time FROM events e JOIN venue v ON e.venue_id=v.pk_venue_id WHERE venue_id IN (SELECT pk_venue_id from venue where venue_zip_code = %s)' %zipcode
-			cursor.execute(query)
-			  
+			query='SELECT v.venue_name, v.venue_st_addr, v.venue_zip_code, v.pk_venue_id FROM venue v where venue_zip_code = %s'
+			cursor.execute(query,zipcode)
 			venuesforzipcode=cursor.fetchall()
-			
-			connection.commit()
 			connection.close()
 			
 			if (venuesforzipcode is not None):
@@ -201,6 +202,7 @@ class MainFunctions():
 
 
 	def add_venue(self,venuedata):
+		connection = self.db_connection()
 		with connection.cursor() as cursor:
 			venuename=venuedata['venuename']
 			venuedesc=venuedata['venuedesc']
@@ -217,15 +219,34 @@ class MainFunctions():
 
 
 
-	def display_venues_for_zipcode(zipcode) :
-		query1='SELECT e.event_name, e.event_date, v.venue_name, e.start_time, e.end_time FROM events e JOIN venue v ON e.venue_id=v.pk_venue_id WHERE venue_id IN (SELECT pk_venue_id from venue where venue_zip_code = %s)' %zipcode
-		cursor.execute(query1)
-		venuesforzipcode=cursor.fetchall()
-		if (venuesforzipcode is not None):
-			for venue in venuesforzipcode:
-				 print("\n\nEvent Name:",venue[0],"\nEvent Date:",venue[1], "\nVenue Name:", venue[2], "\nEvent Timings:",venue[3], ":00 to ", venue[4], ":00\n")
-			else:
-				 print("\nZip Code does exist")
-		connection.close()
+	def display_events_for_zipcode(self, zipcode) :
+		connection = self.db_connection()
+		with connection.cursor() as cursor:
+			query1='SELECT e.event_name, e.event_date, v.venue_name, e.start_time, e.end_time FROM events e JOIN venue v ON e.venue_id=v.pk_venue_id WHERE venue_id IN (SELECT pk_venue_id from venue where venue_zip_code = %s)' %zipcode
+			cursor.execute(query1)
+			venuesforzipcode=cursor.fetchall()
+			if (venuesforzipcode is not None):
+				for venue in venuesforzipcode:
+					 print("\n\nEvent Name:",venue[0],"\nEvent Date:",venue[1], "\nVenue Name:", venue[2], "\nEvent Timings:",venue[3], ":00 to ", venue[4], ":00\n")
+				else:
+					 print("\nZip Code does exist")
+			connection.close()
+			return venuesforzipcode
+		
+
+
+	def display_events_for_venue_id(self, venue_id) :
+		connection = self.db_connection()
+		with connection.cursor() as cursor:
+			query1='SELECT e.event_name, e.event_date, v.venue_name, e.start_time, e.end_time FROM events e JOIN venue v ON e.venue_id=v.pk_venue_id WHERE venue_id = %s'
+			cursor.execute(query1)
+			eventlist=cursor.fetchall()
+			if (eventlist is not None):
+				for event in eventlist:
+					 print("\n\nEvent Name:",event[0],"\nEvent Date:",event[1], "\nVenue Name:", event[2], "\nEvent Timings:",event[3], ":00 to ", event[4], ":00\n")
+				else:
+					 print("\nZip Code does exist")
+			connection.close()
+			return eventlist
 
 
