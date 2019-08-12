@@ -28,25 +28,22 @@
      <table class="rwd-table">
         <tbody>
             <tr>
-            <b><td>User Name</td>
-            <td>First Name</td>
-            <td>Last Name</td>
-            <td>Current Active Status</td>
-            <td>Admin Status</td>
+            <b><td>Event Name</td>
+            <td>Venue Name</td>
+            <td>Event Date</td>
+            <td>Start Time</td>
+            <td>End Time</td>
+            <td>Spots Left</td>
             <td>Remove?</td>
-            <td>Activate?</td>
-            <td>Admin?</td></b>
             </tr>
-            {% for user in list %}
-             <tr><td>{{ user[1] }}</td>
-                <td>{{ user[2] }} </td> 
-                <td>{{ user[3] }} </td>
-                <td>{% if user[4]=='A' %}Active{%else%}Inactive{%endif%}</td>
-                <td>{% if user[5]=='A' %}Admin{%else%}Not an Admin{%endif%}</td>
-                <td><form action="/removeuser" method="POST" ><button class="btn btn-table" type="submit" name="userid" value="{{  user[0]  }}" onclick="window.location.href='{{ url_for('removeuser') }}';">Remove User</button></form>
-                <td><form action="/activateuser" method="POST" ><button class="btn btn-table" type="submit" name="userid" value="{{  user[0]  }}" onclick="window.location.href='{{ url_for('activateuser') }}';">Activate User</button></form>
-                 <td><form action="/makeadmin" method="POST" ><button class="btn btn-table" type="submit" name="userid" value="{{  user[0]  }}" onclick="window.location.href='{{ url_for('makeadmin') }}';">Make Admin</button></form>
-                </td>
+            {% for event in list %}
+             <tr><td>{{ event[0] }}</td>
+                <td>{{ event[1] }} </td> 
+                <td>{{ event[2] }} </td>
+                <td>{( event[3] )}</td>
+                <td>{( event[4] )}</td>
+                <td>{( event[5] )}</td>
+                <td><form action="/removeevent" method="POST" ><button class="btn btn-table" type="submit" name="eventid" value="{{  event[6]  }}" onclick="window.location.href='{{ url_for('removeevent') }}';">Remove Event</button></form>
             </tr>
          {% endfor %}
          </tbody>

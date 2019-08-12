@@ -28,12 +28,20 @@
      <table class="rwd-table">
         <tbody>
             <tr>
-            <td><b>Event Name</td>
-            <td>Address</td>
-            <td>Date</td>
-            <td>Start Time</td>
-            <td>End Time</td></b>
+            <td><b>Event Date</td></b>
+            <td><b>Event Name</td></b>
+            <td><b>Venue</td></b>
+            <td><b>Start Time</td></b>
+            <td><b>End Time</td></b>
             </tr>
+            {% for event in list %}
+             <tr><td>{{ event[0] }}</td>
+                <td>{{ event[1] }} </td>
+                <td>{{ event[2] }} </td>
+                <td>{{ event[3] }} </td>
+                <td>{{ event[4] }} </td>
+            </tr>
+         {% endfor %}
          </tbody>
      </table>
 

@@ -145,6 +145,21 @@ def venueevents():
         return "<h2>"+result[1]+"</h2>"
 
 
+@app.route("/editevents", methods=['GET','POST'])
+def editevents():
+    func = CommonFunctions()
+    result = func.get_all_events()
+    print(result[1])
+    if(result[0] == 1):
+        return render_template("event_list.html", title="Event List", list=result[1])
+    else:
+        return "<h2>"+result[1]+"</h2>"
+
+@app.route("/removeevent", methods=['GET','POST'])
+def removeevent():
+    func = MainFunctions()
+    return render_template("success_joined.html", title="Event Removed")
+
 @app.route("/joinevent", methods=['GET','POST'])
 def joinevent():
     func = MainFunctions()
@@ -157,11 +172,49 @@ def joinevent():
 @app.route("/joinedgames", methods=['GET','POST'])
 def joinedgames():
     func = MainFunctions()
+    result = func.events_joined_user_id(session['userid'])
+    print(result[1])
+    if(result[0] == 1):
+        return render_template("joined_games.html", title="Joined Games", list=result[1])
+    else:
+        return "<h2>"+result[1]+"</h2>"
+
+@app.route("/userlist", methods=['GET','POST'])
+def userlist():
+    func = CommonFunctions()
+    list = func.get_all_users()
+    return render_template("user_list.html", title="User Directory", list=list)
+
+
+
+@app.route("/makeadmin", methods=['GET','POST'])
+def makeadmin():
+    func = MainFunctions()
     # Show joined events of the user
-    # result = 
+    result = func.makeadmin_user(request.form['userid'])
+    return redirect(url_for('userlist'))
 
-    return render_template("joined_events.html", title="Joined Games")
+@app.route("/removeuser", methods=['GET','POST'])
+def removeuser():
+    func = MainFunctions()
+    # Show joined events of the user
+    print(request.form['userid'])
+    result = func.remove_user(request.form['userid'])
+    if result[0]==1:
+        return redirect(url_for('userlist'))
+    else:
+        return "<h2>"+result[1]+"</h2"
 
+@app.route("/activateuser", methods=['GET','POST'])
+def activateuser():
+    func = MainFunctions()
+    # Show joined events of the user
+    print(request.form['userid'])
+    result = func.activate_user(request.form['userid'])
+    if result[0]==1:
+        return redirect(url_for('userlist'))
+    else:
+        return "<h2>"+result[1]+"</h2"
 
 @app.route('/now')
 def main():

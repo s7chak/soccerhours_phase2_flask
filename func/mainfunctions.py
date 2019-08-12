@@ -258,34 +258,64 @@ class MainFunctions():
 	def events_joined_user_id(self, user_id) :
 		connection = self.db_connection()
 		with connection.cursor() as cursor:
-			query='SELECT  e.event_date, e.event_name, v.venue_name, e.start_time, e.end_time, e.pk_event_id FROM events e JOIN venue v ON e.venue_id=v.pk_venue_id WHERE venue_id = %s'
-			cursor.execute(query, venue_id)
+			print(user_id)
+			query='SELECT  e.event_date, e.event_name, v.venue_name, e.start_time, e.end_time, e.pk_event_id FROM events e JOIN venue v ON e.venue_id=v.pk_venue_id  JOIN event_members em ON  e.pk_event_id=em.event_id WHERE em.user_id = %s'
+			cursor.execute(query, user_id)
 			eventlist=cursor.fetchall()
 			response=list()
+			elem=list()
 			for event in eventlist:
 				date_time = event[0].strftime("%m-%d-%Y")
-				response.append(date_time)
-				response.append(event[1])
-				response.append(event[2])
-				response.append(str(event[3])+":00")
-				response.append(str(event[4])+":00")
+				elem.append(date_time)
+				elem.append(event[1])
+				elem.append(event[2])
+				elem.append(str(event[3])+":00")
+				elem.append(str(event[4])+":00")
+				response.append(elem)
 				
 			connection.close()
 			if (eventlist is not None):
-				return (1,eventlist)
+				return (1,response)
 			else:
-				return (0,"No events at selected venue.")
+				return (0,"No events joined by this user.")
 
 
 
-	def deactivate_user(self, user_id):
+	def remove_user(self, user_id):
 		connection = self.db_connection()
 		with connection.cursor() as cursor:
-			
 			query='''UPDATE user SET user_status='U' WHERE pk_user_id=%s'''
 			cursor.execute(query, user_id)
-			
+			connection.commit()			
 			connection.close()
+			if cursor.rowcount==1:
+				return (1, "User with userid:"+user_id+" has been deactivated")
+			else:
+				return (0,"Failed to deactivate user or you tried to make an deactivate an Inactive user.")
 
+
+	def activate_user(self, user_id):
+		connection = self.db_connection()
+		with connection.cursor() as cursor:
+			query='''UPDATE user SET user_status='A' WHERE pk_user_id=%s'''
+			cursor.execute(query, user_id)
+			connection.commit()			
+			connection.close()
+			if cursor.rowcount==1:
+				return (1, "User with userid:"+user_id+" has been activated")
+			else:
+				return (0,"Failed to Activate user or you tried to make an activate an Active user.")
+
+	def makeadmin_user(self, user_id):
+		connection = self.db_connection()
+		with connection.cursor() as cursor:
+			query='''UPDATE user SET admin_status='A' WHERE pk_user_id=%s'''
+			cursor.execute(query, user_id)
+			connection.commit()			
+			connection.close()
+			if cursor.rowcount==1:
+				return (1, "User with userid:"+user_id+" has been activated")
+			else:
+				return (0,"Failed to make user Admin or you tried to make an Admin user as Admin.")
 
 

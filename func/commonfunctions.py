@@ -184,7 +184,16 @@ class CommonFunctions():
             if(user!=None):
                 return True
             return False
-            
+  
+    #Function to check if an user exists
+    def check_admin_user(self,userid):
+        connection = self.db_connection()
+        with connection.cursor() as cursor:
+            cursor.execute(''' Select admin_statusfrom user where pk_user_id=%s ''',[userid])
+            user=cursor.fetchone()
+            if user[0]=='A':
+                return True
+            return False
 
 
 
@@ -231,4 +240,35 @@ class CommonFunctions():
             cursor.execute(''' Select pk_venue_id, venue_name from venue ''')
             return cursor.fetchall()
 
+    def get_all_users(self):
+        connection = self.db_connection()
+        with connection.cursor() as cursor:
+            cursor.execute(''' Select pk_user_id, username, user_fname, user_lname, user_status, admin_status from user ''')
+            return cursor.fetchall()
+
+
+    def get_all_events(self):
+        connection = self.db_connection()
+        with connection.cursor() as cursor:
+            query='SELECT e.event_name, v.venue_name, e.event_date, e.start_time, e.end_time, (e.event_capacity - e.members_joined), e.pk_event_id FROM events e JOIN venue v ON e.venue_id=v.pk_venue_id'
+            cursor.execute(query)
+            eventlist=cursor.fetchall()
+            response=list()
+            elem=list()
+            for event in eventlist:
+                date_time = event[2].strftime("%m-%d-%Y")
+                elem.append(event[0])
+                elem.append(event[1])
+                elem.append(date_time)
+                elem.append(str(event[3])+":00")
+                elem.append(str(event[4])+":00")
+                elem.append(event[5])
+                elem.append(event[6])
+                response.append(elem)
+                
+            connection.close()
+            if (eventlist is not None):
+                return (1,response)
+            else:
+                return (0,"No events currently booked.")
 
