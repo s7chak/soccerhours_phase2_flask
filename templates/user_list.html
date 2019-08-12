@@ -19,7 +19,7 @@
 </head>
 <!-- <h1>Soccer Hours</h1> -->
 <br>
-<h2>Venues in your Zip Code</h3>
+<h2>Events you have joined</h3>
 
 <br><br><br>
 
@@ -27,18 +27,12 @@
 <body>
      <table class="rwd-table">
         <tbody>
-        <tr>
-        <td><b>Venue Name</td>
-        <td>Address</td>
-        <td>See events</td></b>
-        </tr>
-         {% for venue in list %}
-             <tr><td>{{ venue[0] }}</td>
-                <td>{{ venue[1] }} </td> 
-                <td><form action="/venueevents" method="POST" ><button class="btn btn-table" type="submit" name="venue" value="{{  venue[3]  }}" onclick="window.location.href='{{ url_for('venueevents') }}';">Check it out</button></form>
-                </td>
+            <tr>
+            <b><td>User Name</td>
+            <td>First Name</td>
+            <td>Last Name</td>
+            <td>Current Status</td></b>
             </tr>
-         {% endfor %}
          </tbody>
      </table>
 

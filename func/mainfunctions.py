@@ -255,6 +255,27 @@ class MainFunctions():
 			else:
 				return (0,"No events at selected venue.")
 
+	def events_joined_user_id(self, user_id) :
+		connection = self.db_connection()
+		with connection.cursor() as cursor:
+			query='SELECT  e.event_date, e.event_name, v.venue_name, e.start_time, e.end_time, e.pk_event_id FROM events e JOIN venue v ON e.venue_id=v.pk_venue_id WHERE venue_id = %s'
+			cursor.execute(query, venue_id)
+			eventlist=cursor.fetchall()
+			response=list()
+			for event in eventlist:
+				date_time = event[0].strftime("%m-%d-%Y")
+				response.append(date_time)
+				response.append(event[1])
+				response.append(event[2])
+				response.append(str(event[3])+":00")
+				response.append(str(event[4])+":00")
+				
+			connection.close()
+			if (eventlist is not None):
+				return (1,eventlist)
+			else:
+				return (0,"No events at selected venue.")
+
 
 
 	def deactivate_user(self, user_id):

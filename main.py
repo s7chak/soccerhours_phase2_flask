@@ -154,10 +154,12 @@ def joinevent():
 
 
 
-@app.route("/joinedevents", methods=['GET','POST'])
+@app.route("/joinedgames", methods=['GET','POST'])
 def joinedgames():
     func = MainFunctions()
-    # func.user_joins_event(userid,eventid)
+    # Show joined events of the user
+    # result = 
+
     return render_template("joined_events.html", title="Joined Games")
 
 
