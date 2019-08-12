@@ -1,3 +1,4 @@
+{% extends "layout.html" %}
 <!doctype html>
 
 <html>
@@ -19,7 +20,8 @@
 </head>
 <!-- <h1>Soccer Hours</h1> -->
 <br>
-<h2>Soccer Hours - User Directory</h3>
+{% block content %}
+<h2>Soccer Hours - All Events List</h3>
 
 <br><br><br>
 
@@ -34,21 +36,23 @@
             <td>Start Time</td>
             <td>End Time</td>
             <td>Spots Left</td>
-            <td>Remove?</td>
+            <td>Active Status</td>
+            <td>Remove?</td></b>
             </tr>
             {% for event in list %}
              <tr><td>{{ event[0] }}</td>
                 <td>{{ event[1] }} </td> 
                 <td>{{ event[2] }} </td>
-                <td>{( event[3] )}</td>
-                <td>{( event[4] )}</td>
-                <td>{( event[5] )}</td>
+                <td>{{ event[3] }}</td>
+                <td>{{ event[4] }}</td>
+                <td>{{ event[5] }}</td>
+                <td>{% if event[7]=='A' %}Active {% else %} Inactive {% endif%}</td>
                 <td><form action="/removeevent" method="POST" ><button class="btn btn-table" type="submit" name="eventid" value="{{  event[6]  }}" onclick="window.location.href='{{ url_for('removeevent') }}';">Remove Event</button></form>
             </tr>
          {% endfor %}
          </tbody>
      </table>
-
+    {% endblock %}
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>

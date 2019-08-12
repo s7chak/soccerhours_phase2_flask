@@ -5,6 +5,7 @@ import pymysql
 
 class CommonFunctions():
     
+
     def db_connection(self):
         db_user = os.environ.get('CLOUD_SQL_USERNAME')
         db_password = os.environ.get('CLOUD_SQL_PASSWORD')
@@ -18,21 +19,6 @@ class CommonFunctions():
             cnx = pymysql.connect(user='root', password='root1234', host=host, db='soccerhoursdb')
             
         return cnx
-
-
-    def __init__(self):
-        if os.environ.get('GAE_ENV') == 'standard':
-            unix_socket = '/cloudsql/{}'.format(db_connection_name)
-            cnx = pymysql.connect(user=db_user, password=db_password, unix_socket=unix_socket, db=db_name)
-        else:
-            host = '127.0.0.1'
-            cnx = pymysql.connect(user='root', password='root1234', host=host, db='soccerhoursdb')
-
-        with cnx.cursor() as cursor:
-            cursor.execute('SELECT NOW() as now;')
-            result = cursor.fetchall()
-            print(result[0][0])
-        cnx.close()
 
 
     # Duplicate UserName check
@@ -250,13 +236,14 @@ class CommonFunctions():
     def get_all_events(self):
         connection = self.db_connection()
         with connection.cursor() as cursor:
-            query='SELECT e.event_name, v.venue_name, e.event_date, e.start_time, e.end_time, (e.event_capacity - e.members_joined), e.pk_event_id FROM events e JOIN venue v ON e.venue_id=v.pk_venue_id'
+            query='SELECT e.event_name, v.venue_name, e.event_date, e.start_time, e.end_time, (e.event_capacity - e.members_joined), e.pk_event_id, e.event_status FROM events e JOIN venue v ON e.venue_id=v.pk_venue_id'
             cursor.execute(query)
             eventlist=cursor.fetchall()
             response=list()
-            elem=list()
+            print(eventlist)
             for event in eventlist:
                 date_time = event[2].strftime("%m-%d-%Y")
+                elem=list()
                 elem.append(event[0])
                 elem.append(event[1])
                 elem.append(date_time)
@@ -264,8 +251,10 @@ class CommonFunctions():
                 elem.append(str(event[4])+":00")
                 elem.append(event[5])
                 elem.append(event[6])
+                elem.append(event[7])
                 response.append(elem)
-                
+                print(elem)
+            
             connection.close()
             if (eventlist is not None):
                 return (1,response)

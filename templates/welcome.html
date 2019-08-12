@@ -1,34 +1,44 @@
-<!-- {% extends "layout.html" %} -->
-{% block content %}
-<h1>Soccer Hours</h1>
-{% endblock content %}
 <!doctype html>
 
 <html>
 <head>
-	<meta charset="utf-8">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='main.css') }}">
-<title>Soccer Hours</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+
+    {% if title %}
+        <title>Soccer Hours - {{ title }}</title>
+    {% else %}
+        <title>Soccer Hours</title>
+    {% endif %}
 </head>
 <br>
-<h3>Welcome</h3>&ensp;
+<h2 align="center"><font style="sans serif" color="black"><b>Welcome To Soccer Hours</b></font></h2>
+<h4 align="center">Join your next game!</h4>
 <br><br><br>
 
-<body class="bg">
-<div align="center" class="container">
+<body style="height: 100%; background: url('/static/img/bg-all.jpeg') no-repeat center center fixed;   -webkit-background-size: cover;  -moz-background-size: cover; overflow:hidden; height: 100%;">
 
-<button class="button btn-primary" onclick="">Sign Up</button>
+
+<!-- <header class="site-header" style="background-image:url( img/bg-all.jpeg )"> -->
+<div align="center" class="container">
+<br><br><br><br><br>
+<button class="button btn-primary" onclick="window.location.href='{{ url_for('signup') }}';">Sign Up</button>
 
 <br><br><br><br>
-<font size="2"><p style="text-align:center">Existing user?</p></font>
-<button class="button btn-primary" onclick="user_login.html">Login</button>
+<font size="3"><p style="text-align:center; color:black;"><b>Existing user?</b></p></font>
+<button class="button btn-primary" onclick="window.location.href='{{ url_for('login') }}';">Login</button>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-
+<!-- </header> -->
 </body>
+
 </html>

@@ -5,8 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='custom.css') }}">
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
 
@@ -16,7 +17,7 @@
         <title>Soccer Hours</title>
     {% endif %}
 </head>
-<body>
+<body style="height: 100%; background: url('/static/img/bg-common.jpg') no-repeat center center fixed; -webkit-background-size: cover;  -moz-background-size: cover; overflow:hidden; height: 100%;">
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
@@ -26,7 +27,7 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
-              <a class="nav-item nav-link" href="/">Home</a>
+              <a class="nav-item nav-link" href="/home">Home</a>
             </div>
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
@@ -37,25 +38,11 @@
         </div>
       </nav>
     </header>
-    <main role="main" class="container" 
-    
-    >
+    <main role="main" class="container">
       <div class="row">
         <div class="col-md-8">
           {% block content %}{% endblock %}
         </div>
-        <!-- <div class="col-md-4">
-          <div class="content-section">
-            <h3>Our Sidebar</h3>
-            <p class='text-muted'>You can put any information here you'd like.
-              <ul class="list-group">
-                <li class="list-group-item list-group-item-light">Latest Posts</li>
-                <li class="list-group-item list-group-item-light">Announcements</li>
-                <li class="list-group-item list-group-item-light">Calendars</li>
-                <li class="list-group-item list-group-item-light">etc</li>
-              </ul>
-            </p>
-          </div> -->
         </div>
       </div>
     </main>

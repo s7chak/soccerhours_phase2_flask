@@ -2,7 +2,7 @@
 import os
 
 from flask import Flask, render_template, url_for, redirect, flash, jsonify, request, session
-from forms import SignUpForm, LoginForm, SlotDateSearchForm, ZipSearchForm, VenueDateForm, StartEventForm
+from forms import SignUpForm, LoginForm, ZipSearchForm, VenueDateForm, StartEventForm, DateSearchForm
 import pymysql
 from func.mainfunctions import MainFunctions
 from func.commonfunctions import CommonFunctions
@@ -15,13 +15,11 @@ db_connection_name = os.environ.get('CLOUD_SQL_CONNECTION_NAME')
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '294d86e9fd5e4b179261796459238269'
-userid=0
-venueid=0
-eventid=0
+
 
 @app.route("/")
 def welcome():
-    return render_template("welcome.html")
+    return render_template("welcome.html", title="Home")
 
 @app.route("/home")
 def home():
@@ -100,7 +98,24 @@ def zipsearch():
         venuelist = func.get_venues_for_zipcode(form.zipcode.data)
         # return redirect(url_for('venues', list=venuelist))
         return render_template('display_venues.html', list=venuelist)
-    return render_template("zip_search.html", title="SearchZip", form=form)
+    return render_template("zip_search.html", title="Search Game", form=form)
+
+
+# Display venues for Zip Code
+@app.route("/datesearch", methods=['GET','POST'])
+def datesearch():
+    form = DateSearchForm()
+    if form.validate_on_submit():
+        func = MainFunctions()
+        result = func.get_events_for_slot(form.starttime.data, form.endtime.data, form.eventdate.data)
+        if(result[0] == 1):
+            print(result[1])
+            return render_template("venue_events.html", title="Events", list=result[1])
+        else:
+            return "<h2>"+result[1]+"</h2>"
+    return render_template("slotdate_search.html", title="Search Game", form=form)
+
+
 
 # Start an Event
 @app.route("/startevent", methods=['GET','POST'])
@@ -110,8 +125,7 @@ def startevent():
     venuelist = func.get_all_venues()
     print("Startevent Body")
     if form.validate_on_submit():
-        print("submitted")
-        print(session['username'])
+        
         mainfunc = MainFunctions()
         data = {}
         data['venueid'] = request.form['venue']
@@ -123,6 +137,15 @@ def startevent():
         data['endtime'] = form.endtime.data
         data['eventcapacity'] = form.eventcapacity.data
         data['genderoption'] = form.genderoption.data
+
+        result = mainfunc.get_venues_for_slot(data['starttime'],data['endtime'],data['eventdate'])
+        available_venue_list = [i[0] for i in result]
+        
+
+        if data['venueid'] not in available_venue_list:
+            flash(f'The venue is not available for given slots. Please try with a different slot/venue.', 'error')
+            return redirect(url_for('startevent'))            
+
         result = mainfunc.start_event(data)
         if result[0]==0:
             return '<h2>'+result[1]+'</h2>'
@@ -140,7 +163,7 @@ def venueevents():
     result = func.display_events_for_venue_id(request.form['venue'])
     print(result[1])
     if(result[0] == 1):
-        return render_template("venue_events.html", title="VenueEvents", list=result[1])
+        return render_template("venue_events.html", title="Events", list=result[1])
     else:
         return "<h2>"+result[1]+"</h2>"
 
@@ -149,7 +172,6 @@ def venueevents():
 def editevents():
     func = CommonFunctions()
     result = func.get_all_events()
-    print(result[1])
     if(result[0] == 1):
         return render_template("event_list.html", title="Event List", list=result[1])
     else:
@@ -158,7 +180,16 @@ def editevents():
 @app.route("/removeevent", methods=['GET','POST'])
 def removeevent():
     func = MainFunctions()
-    return render_template("success_joined.html", title="Event Removed")
+    # Show joined events of the user
+    print(request.form['eventid'])
+    result = func.deactivate_event(request.form['eventid'])
+    if result[0]==1:
+        return redirect(url_for('editevents'))
+    else:
+        return "<h2>"+result[1]+"</h2"
+
+
+
 
 @app.route("/joinevent", methods=['GET','POST'])
 def joinevent():
@@ -173,7 +204,7 @@ def joinevent():
 def joinedgames():
     func = MainFunctions()
     result = func.events_joined_user_id(session['userid'])
-    print(result[1])
+    # print(result[1])
     if(result[0] == 1):
         return render_template("joined_games.html", title="Joined Games", list=result[1])
     else:
@@ -204,6 +235,8 @@ def removeuser():
         return redirect(url_for('userlist'))
     else:
         return "<h2>"+result[1]+"</h2"
+
+
 
 @app.route("/activateuser", methods=['GET','POST'])
 def activateuser():
@@ -239,7 +272,6 @@ def main():
     cnx.close()
 
     return str(current_time)
-
 
 
 

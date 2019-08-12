@@ -17,7 +17,7 @@
     {% endif %}
 </head>
 	<header class="site-header">
-	  <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+	  <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top" style="background-color='black'">
 	    <div class="container">
 	      <a class="navbar-brand mr-4" href="/">Soccer Hours</a>
 	      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,22 +28,25 @@
 	          <a class="nav-item nav-link" href="/">Home</a>
 	        </div>
 	        <!-- Navbar Right Side -->
-	        <div class="navbar-nav">
+	        <div class="navbar-nav"  style="background:'black'">
 	        	{% if (admin=='A') %}
 	        	<div>
 	        	<a class="nav-item nav-link" href="/admin">Admin</a></div>
 	        	{% endif %}
 	          <a class="nav-item nav-link" href="/login">Login</a>
-	          <a class="nav-item nav-link" href="/signup">Register</a>
+	          <a class="nav-item nav-link" href="/signup">Sign Up</a>
 	        </div>
 	      </div>
 	    </div>
 	  </nav>
 	</header>
-<h3 align="center">Join Games Near You</h3>
+
 <br><br><br><br>
-<body>
+<body style="height: 100%; background: url('/static/img/bg-common.jpg') no-repeat center center fixed; -webkit-background-size: cover;  -moz-background-size: cover; overflow:hidden; height: 100%;">
+<h3 align="center" style="color:'white'"><b>Here for your Footer needs!</b></h3>
+<br>
 <div align="center">
+	<button class="button btn-primary" onclick="window.location.href='{{ url_for( 'datesearch') }}';">Find a Game by Date</button>
 	<button class="button btn-primary" onclick="window.location.href='{{ url_for( 'zipsearch') }}';">Find a Game near You</button>
 	<button class="button btn-primary" onclick="window.location.href='{{ url_for( 'startevent') }}';">Start your Event</button>
 	<button class="button btn-primary" onclick="window.location.href='{{ url_for( 'joinedgames') }}';">Your Events</button>

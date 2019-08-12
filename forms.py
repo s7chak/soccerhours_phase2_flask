@@ -25,10 +25,10 @@ class ZipSearchForm(FlaskForm):
 	zipcode = IntegerField('Zip Code', validators=[DataRequired()],render_kw={"placeholder": "Enter the zip code to search"})
 	submit = SubmitField('Search this area')
 
-class SlotDateSearchForm(FlaskForm):
+class DateSearchForm(FlaskForm):
 	starttime = IntegerField('Start Time(24-hr clock)', validators=[DataRequired()],render_kw={"placeholder": "Enter start time hour"})
-	zipcode = IntegerField('End Time(24-hr clock)', validators=[DataRequired()],render_kw={"placeholder": "Enter end time hour"})
-	eventdate = StringField('Date', validators=[DataRequired()],render_kw={"placeholder": ""})
+	endtime = IntegerField('End Time(24-hr clock)', validators=[DataRequired()],render_kw={"placeholder": "Enter end time hour"})
+	eventdate = StringField('Date (YYYY-MM-DD)', validators=[DataRequired()],render_kw={"placeholder": ""})
 	submit = SubmitField('Search Events')
 
 class VenueDateForm(FlaskForm):

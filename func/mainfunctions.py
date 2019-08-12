@@ -38,8 +38,8 @@ class MainFunctions():
 			now=datetime.datetime.now()
 			now=now.strftime('%Y-%m-%d')
 
-			cursor.execute(''' INSERT INTO user VALUES((select seq from sqlite_sequence where name='user')+1,%s,%s,%s,%s,'I',%s,%s,%s,%s) ''',[firstname,lastname,username,isadmin,email,password,int(zipcode),now])
-			cursor.execute(''' UPDATE sqlite_sequence set seq=seq+1 where name=\'user\' ''')
+			cursor.execute(''' INSERT INTO user VALUES((select seq from sequences where name='user')+1,%s,%s,%s,%s,'I',%s,%s,%s,%s) ''',[firstname,lastname,username,isadmin,email,password,int(zipcode),now])
+			cursor.execute(''' UPDATE sequences set seq=seq+1 where name=\'user\' ''')
 			connection.commit()
 			connection.close()
 			if cursor.rowcount == 1:
@@ -71,25 +71,37 @@ class MainFunctions():
 				return [0]
 
 
-	def get_venues_for_slot(self,starttime, endtime, date):
+	def get_events_for_slot(self,starttime, endtime, date):
 		connection = self.db_connection()
 		with connection.cursor() as cursor:
 			c = common()
 			if c.check_start_end_time(starttime,'S') and c.check_start_end_time(endtime,'E'):
 				slotids=c.get_slot_ids(int(starttime),int(endtime))
 			else:
-				print("\nInvalid timings entered. Venue not booked.\n\nValid values are : \nRange of 8 - 20 for Start time\nRange of 9 - 21 for End time")
+				print("\nInvalid timings entered. Event cannot be searched.\n\nValid values are : \nRange of 8 - 20 for Start time\nRange of 9 - 21 for End time")
 				return None
 
-			print ("\n\nThe Venues that have %s => %s Slots available:" % (starttime, endtime))
-
 			print(slotids)
-			query='SELECT distinct s.venue_id, v.venue_name from slots s join venue v on v.pk_venue_id=s.venue_id where venue_id not in (SELECT distinct venue_id from slots where availability =\'U\' and slot_id in (' + ','.join((str(n) for n in slotids)) + ') and date=\'%s\') UNION SELECT distinct v.pk_venue_id, v.venue_name from venue v where pk_venue_id not in (SELECT venue_id from slots)' % date
+			query=' SELECT  e.event_date, e.event_name, v.venue_name, e.start_time, e.end_time, e.pk_event_id FROM events e join venue v on v.pk_venue_id=e.venue_id where e.venue_id in (SELECT distinct venue_id from slots where availability =\'U\' and slot_id in (' + ','.join((str(n) for n in slotids)) + ') and date=\'%s\')' % date
 			cursor.execute(query)
 			
-			venuesforslot=cursor.fetchall()
+			eventlist=cursor.fetchall()
 
-			return venuesforslot
+			for event in eventlist:
+				date_time = event[0].strftime("%m-%d-%Y")
+				response.append(date_time)
+				response.append(event[1])
+				response.append(event[2])
+				response.append(str(event[3])+":00")
+				response.append(str(event[4])+":00")
+				
+			connection.close()
+			if (eventlist is not None):
+				return (1,eventlist)
+			else:
+				return (0,"There are no live games for the given time slots and date.")
+
+			return eventlist
 
 
 
@@ -115,7 +127,7 @@ class MainFunctions():
 				slotids=[]
 				slotids=c.get_slot_ids(int(starttime),int(endtime))
 				
-			cursor.execute(''' Select seq+1 from sqlite_sequence where name='events' ''')	
+			cursor.execute(''' Select seq+1 from sequences where name='events' ''')	
 			eventid=cursor.fetchone()[0]
 			
 			datestatus=c.check_valid_date(eventdate)
@@ -144,7 +156,7 @@ class MainFunctions():
 					else:
 						return (0,"User ID not found for user:"+username)
 					cursor.execute(''' INSERT INTO events(pk_event_id,event_name,event_desc,event_date,start_time,end_time,user_id,venue_id,event_capacity,event_status,members_joined,gender_option) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,'A',1,%s) ''',[eventid,eventname,eventdesc,eventdate,starttime,endtime,userid,venueid,eventcapacity,genderoption])
-					cursor.execute(''' UPDATE sqlite_sequence set seq=seq+1 where name='events' ''')
+					cursor.execute(''' UPDATE sequences set seq=seq+1 where name='events' ''')
 					# Insert entry in event_members
 					cursor.execute(''' INSERT INTO event_members VALUES(%s,%s) ''',[eventid,userid])
 					connection.commit()
@@ -175,13 +187,18 @@ class MainFunctions():
 
 			if eventroom[0]>eventroom[1]:
 				# Update Events table
-				cursor.execute(''' Update events set members_joined=members_joined+1 where pk_event_id=%s ''', [eventid])
+				cursor.execute(''' Select count(1) from event_members where event_id=%s and user_id=%s''', [eventid,userid])
+				joined=cursor.fetchone()[0]
+				if joined>0:
+					return "You have already joined this event."
+				else:
+					cursor.execute(''' Update events set members_joined=members_joined+1 where pk_event_id=%s ''', [eventid])
 
-				# Update EventMembers table
-				cursor.execute(''' INSERT INTO event_members values (%s,%s) ''',[eventid, userid])
-				connection.commit()
-				print("UserID: {0} has joined event: {1}".format(userid,eventid))
-				return "You have joined an event."
+					# Update EventMembers table
+					cursor.execute(''' INSERT INTO event_members values (%s,%s) ''',[eventid, userid])
+					connection.commit()
+					print("UserID: {0} has joined event: {1}".format(userid,eventid))
+					return "You have joined an event."
 			else:
 				return "Sorry, but the event is full"
 
@@ -212,8 +229,8 @@ class MainFunctions():
 			venuedesc=venuedata['venuedesc']
 			venueaddr=venuedata['venueaddr']
 			zipcode=venuedata['zipcode']
-			cursor.execute(''' INSERT INTO venue VALUES((Select seq+1 from sqlite_sequence where name='venue'),%s,%s,%s,%s) ''',(venuename,venuedesc,venueaddr,zipcode))
-			cursor.execute(''' UPDATE sqlite_sequence set seq=seq+1 where name=\'venue\' ''')
+			cursor.execute(''' INSERT INTO venue VALUES((Select seq+1 from sequences where name='venue'),%s,%s,%s,%s) ''',(venuename,venuedesc,venueaddr,zipcode))
+			cursor.execute(''' UPDATE sequences set seq=seq+1 where name=\'venue\' ''')
 			connection.commit()
 			connection.close()
 			if cursor.rowcount == 1:
@@ -226,7 +243,7 @@ class MainFunctions():
 	def display_events_for_zipcode(self, zipcode) :
 		connection = self.db_connection()
 		with connection.cursor() as cursor:
-			query1='SELECT e.event_name, e.event_date, v.venue_name, e.start_time, e.end_time, e.pk_event_id FROM events e JOIN venue v ON e.venue_id=v.pk_venue_id WHERE venue_id IN (SELECT pk_venue_id from venue where venue_zip_code = %s)' %zipcode
+			query1='SELECT e.event_name, e.event_date, v.venue_name, e.start_time, e.end_time, e.pk_event_id, (e.event_capacity - e.members_joined) FROM events e JOIN venue v ON e.venue_id=v.pk_venue_id WHERE e.venue_id IN (SELECT pk_venue_id from venue where venue_zip_code = %s)' %zipcode
 			cursor.execute(query1)
 			venuesforzipcode=cursor.fetchall()
 
@@ -284,7 +301,7 @@ class MainFunctions():
 	def remove_user(self, user_id):
 		connection = self.db_connection()
 		with connection.cursor() as cursor:
-			query='''UPDATE user SET user_status='U' WHERE pk_user_id=%s'''
+			query='''UPDATE user SET user_status='I' WHERE pk_user_id=%s'''
 			cursor.execute(query, user_id)
 			connection.commit()			
 			connection.close()
@@ -317,5 +334,32 @@ class MainFunctions():
 				return (1, "User with userid:"+user_id+" has been activated")
 			else:
 				return (0,"Failed to make user Admin or you tried to make an Admin user as Admin.")
+
+
+	def deactivate_event(self,event_id):
+		connection = self.db_connection()
+		with connection.cursor() as cursor:
+			query = ''' UPDATE events SET event_status='U' WHERE pk_event_id=%s '''
+			cursor.execute(query,event_id)
+			connection.commit()
+			cursor.execute(''' SELECT slot_id FROM slots WHERE event_id=%s ''', event_id)
+			slotids = cursor.fetchall()
+			slot_list = [i[0] for i in slotids]
+			
+			print(slot_list)
+			qmark = "%s"
+			if isinstance(slot_list,list):
+				qmarks= ",".join(qmark for slotid in slot_list)
+			else:
+				qmarks=qmark
+			query=''' UPDATE slots SET availability='A' WHERE venue_id=(SELECT venue_id FROM events WHERE pk_event_id={0}) AND date = (SELECT event_date FROM events WHERE pk_event_id={1} AND slot_id IN ({2}) )'''.format(event_id,event_id,qmarks)
+			cursor.execute(query,slot_list)
+			query=''' DELETE FROM event_members WHERE event_id= %s '''
+			cursor.execute(query,event_id)
+			connection.commit()
+			connection.close()
+			return (1,"Event has been deleted")
+
+
 
 
