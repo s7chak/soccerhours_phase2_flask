@@ -23,8 +23,11 @@ def welcome():
 
 @app.route("/home")
 def home():
-    return render_template("home.html", admin=session['admin'])
-
+    if 'username' in session:
+        return render_template("home.html", admin=session['admin'])
+    else:
+        return redirect(url_for('login'))
+        
 @app.route("/admin")
 def admin():
     if 'admin' in session:
@@ -33,7 +36,7 @@ def admin():
         else:
             return "<h2>Sorry, you are not an admin user at Soccer Hours</h2>"
     else:
-        return render_template('user_login.html', title='Login', admin=session['admin'])
+        return redirect(url_for('login'))
 
 @app.route("/login", methods=['GET','POST'])
 def login():
@@ -67,7 +70,7 @@ def login():
         else:
             return ("<h2>Invalid username or password.</h2>")
 
-    return render_template("user_login.html", title="login", form=form)
+    return render_template("user_login.html", title="Login", form=form)
 
 
 @app.route("/signup", methods=['GET','POST'])
