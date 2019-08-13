@@ -27,11 +27,11 @@ CREATE TABLE user (
 
 );
 
-INSERT INTO user VALUES(101,'Subhayu','Chakravarty','s7chak','A','A','s7chak@gmail.com','GHFHGF^%^^%',78751,'2019-07-28 13:29:09.589918');
+INSERT INTO user VALUES(101,'Subhayu','Chakravarty','s7chak','A','A','s7chak@gmail.com','admin123',78751,'2019-07-28 13:29:09.589918');
 
 INSERT INTO user VALUES(102,'Abhishek','Kardak','k4rd4k','N','A','akardak1@gmail.com','ghkhjGHGHG&^*^&*',78751,'2019-07-28 14:15:07.336178');
 
-INSERT INTO user VALUES(103,'Prajval','Gupta','pgupta','A','A','pgupta@gmail.com','Abcd1234',78751,'2019-07-28 14:17:04.680268');
+INSERT INTO user VALUES(103,'Prajval','Gupta','pgupta','N','A','pgupta@gmail.com','Abcd1234',78751,'2019-07-28 14:17:04.680268');
 
 INSERT INTO user VALUES(104,'Shivang','Arya','sarya7','N','A','sarya7@gmail.com','sarya222',78751,'2019-07-28 14:20:12.563833');
 
