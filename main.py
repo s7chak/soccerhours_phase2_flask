@@ -33,7 +33,7 @@ def admin():
         else:
             return "<h2>Sorry, you are not an admin user at Soccer Hours</h2>"
     else:
-        return render_template('user_login.html', title='Login')
+        return render_template('user_login.html', title='Login', admin=session['admin'])
 
 @app.route("/login", methods=['GET','POST'])
 def login():
@@ -85,7 +85,9 @@ def signup():
         userdata['isadmin'] = "N"
         func.add_user(userdata)
         flash(f'{form.firstname.data}, your account has been created!', 'success')
-        return redirect(url_for('home'))
+        session['admin']='N'
+        session['username']=form.username.data
+        return redirect(url_for('home', admin=session['admin']))
     return render_template("user_signup.html", title="Sign Up", form=form)
 
 
@@ -138,13 +140,14 @@ def startevent():
         data['eventcapacity'] = form.eventcapacity.data
         data['genderoption'] = form.genderoption.data
 
-        result = mainfunc.get_venues_for_slot(data['starttime'],data['endtime'],data['eventdate'])
-        available_venue_list = [i[0] for i in result]
+        # result = mainfunc.get_availvenues_for_slot(data['starttime'],data['endtime'],data['eventdate'])
+        # available_venue_list = [i[0] for i in result]
         
 
-        if data['venueid'] not in available_venue_list:
-            flash(f'The venue is not available for given slots. Please try with a different slot/venue.', 'error')
-            return redirect(url_for('startevent'))            
+        # if data['venueid'] not in available_venue_list:
+        #     flash('The venue is not available for given slots on given date. Please try with a different slot or venue.', 'error')
+        #     message='The venue is not available for given slots on given date. Please try with a different slot or venue.'
+        #     return redirect(url_for('startevent', message=message))
 
         result = mainfunc.start_event(data)
         if result[0]==0:
@@ -152,7 +155,7 @@ def startevent():
         else:
             flash(f'Event: {form.eventname.data} has been started!', 'success')
             return redirect(url_for('home'))
-    return render_template("start_event.html", title="Start Event", form=form, list=venuelist)
+    return render_template("start_event.html", title="Start Event", form=form, list=venuelist, message='')
 
 
 
@@ -164,6 +167,7 @@ def venueevents():
     print(result[1])
     if(result[0] == 1):
         return render_template("venue_events.html", title="Events", list=result[1])
+
     else:
         return "<h2>"+result[1]+"</h2>"
 
@@ -173,7 +177,7 @@ def editevents():
     func = CommonFunctions()
     result = func.get_all_events()
     if(result[0] == 1):
-        return render_template("event_list.html", title="Event List", list=result[1])
+        return render_template("event_list.html", title="Event List", list=result[1], admin=session['admin'])
     else:
         return "<h2>"+result[1]+"</h2>"
 
@@ -214,7 +218,7 @@ def joinedgames():
 def userlist():
     func = CommonFunctions()
     list = func.get_all_users()
-    return render_template("user_list.html", title="User Directory", list=list)
+    return render_template("user_list.html", title="User Directory", list=list, admin=session['admin'])
 
 
 

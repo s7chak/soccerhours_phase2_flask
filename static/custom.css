@@ -5,6 +5,15 @@
   font-color: white;
   padding-left: 10px
  }
+.site-header .navbar-nav .nav-link:hover {
+  background-color: #fffff1;
+  color: #fffddf;
+}
+.site-header .navbar-nav .nav-link.active {
+  background-color: #000000;
+  color: #fffddd;
+  font-weight: 500;
+}
 
 
 .rwd-table {

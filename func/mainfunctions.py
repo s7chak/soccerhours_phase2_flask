@@ -86,7 +86,7 @@ class MainFunctions():
 			cursor.execute(query)
 			
 			eventlist=cursor.fetchall()
-
+			response=list()
 			for event in eventlist:
 				date_time = event[0].strftime("%m-%d-%Y")
 				response.append(date_time)
@@ -94,7 +94,7 @@ class MainFunctions():
 				response.append(event[2])
 				response.append(str(event[3])+":00")
 				response.append(str(event[4])+":00")
-				
+
 			connection.close()
 			if (eventlist is not None):
 				return (1,eventlist)
@@ -102,6 +102,28 @@ class MainFunctions():
 				return (0,"There are no live games for the given time slots and date.")
 
 			return eventlist
+
+
+
+	def get_availvenues_for_slot(self,starttime, endtime, date):
+		connection = self.db_connection()
+		with connection.cursor() as cursor:
+			c = common()
+			if c.check_start_end_time(starttime,'S') and c.check_start_end_time(endtime,'E'):
+				slotids=c.get_slot_ids(int(starttime),int(endtime))
+			else:
+				print("\nInvalid timings entered. Venue not booked.\n\nValid values are : \nRange of 8 - 20 for Start time\nRange of 9 - 21 for End time")
+				return (0,"Invalid timings entered. Venue not booked.\n\nValid values are : \nRange of 8 - 20 for Start time\nRange of 9 - 21 for End time")
+
+			print ("\n\nThe Venues that have %s => %s Slots available:" % (starttime, endtime))
+
+			query='SELECT distinct s.venue_id, v.venue_name from slots s join venue v on v.pk_venue_id=s.venue_id where venue_id not in (SELECT distinct venue_id from slots where availability =\'U\' and slot_id in (' + ','.join((str(n) for n in slotids)) + ') and date=\'%s\') UNION SELECT distinct v.pk_venue_id, v.venue_name from venue v where pk_venue_id not in (SELECT venue_id from slots)' % date
+			cursor.execute(query)
+			
+			venuesforslot=cursor.fetchall()
+			connection.close()
+			return venuesforslot
+
 
 
 
@@ -283,6 +305,7 @@ class MainFunctions():
 			elem=list()
 			for event in eventlist:
 				date_time = event[0].strftime("%m-%d-%Y")
+				elem=list()
 				elem.append(date_time)
 				elem.append(event[1])
 				elem.append(event[2])

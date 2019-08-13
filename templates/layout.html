@@ -31,6 +31,10 @@
             </div>
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
+            {% if (admin=='A') %}
+            <div>
+            <a class="nav-item nav-link" href="/admin">Admin</a></div>
+            {% endif %}
               <a class="nav-item nav-link" href="/login">Login</a>
               <a class="nav-item nav-link" href="/signup">Sign Up</a>
             </div>
