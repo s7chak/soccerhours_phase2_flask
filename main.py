@@ -17,6 +17,96 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '294d86e9fd5e4b179261796459238269'
 
 
+# Routes for Android App
+@app.route("/applogin/<username>/<password>", methods=['GET'])
+def applogin(username, password):
+   func = MainFunctions()
+   userdata={}
+   print(username)
+   userdata['username']=username
+   userdata['password']=password
+   result = func.log_in(userdata)
+   return jsonify(
+       loggedin=result[0],
+       adminstatus=result[1],
+       status=result[2],
+       userid=result[3]
+   )
+
+
+@app.route("/appsignup", methods=['POST'])
+def appsignup():
+   json = request.get_json()
+   if len(json['userName']) != 0:
+       func = MainFunctions()
+       userdata = {}
+       userdata['username'] = json['userName']
+       userdata['firstname'] = json['firstName']
+       userdata['lastname'] = json['lastName']
+       userdata['email'] = json['email']
+       userdata['password'] = json['password']
+       userdata['zipcode'] = json['zipCode']
+       userdata['isadmin'] = "N"
+       result = func.add_user(userdata)
+       return jsonify(result=result)
+   else:
+       return jsonify(result=9)
+
+
+# Route for android
+@app.route("/appzipsearch/<zipcode>", methods=['GET'])
+def appzipsearch(zipcode):
+    func = MainFunctions()
+    userdata={}
+    print(zipcode)
+    userdata['zipcode']=zipcode
+    result = func.display_events_for_zipcode(zipcode)
+    return jsonify(result=result)
+
+
+
+@app.route("/appstartevent", methods=['GET','POST'])
+def appstartevent():
+    json = request.get_json()
+    mainfunc = MainFunctions()
+    data={}
+    data['venueid'] = json['venue']
+    data['username'] = json['usename']
+    data['eventname'] = json['eventname']
+    data['eventdesc'] = json['eventdesc']
+    data['eventdate'] = json['eventdate']
+    data['starttime'] = json['starttime']
+    data['endtime'] = json['endtime']
+    data['eventcapacity'] = json['eventcapacity']
+    data['genderoption'] = json['genderoption']
+    result = mainfunc.start_event(data)
+    return jsonify(result=result)
+
+
+
+@app.route("/appjoinevent", methods=['GET'])
+def  appjoinevent():
+    json = request.get_json()
+    func = MainFunctions()
+    data={}
+    data['userid'] = json['userid']
+    data['eventid'] = json['eventid']
+    result = func.user_joins_event(data)
+    return jsonify(result=result)
+
+
+@app.route("/appjoinedgames", methods=['GET'])
+def appjoinedgames():
+    json = request.get_json()
+    func = MainFunctions()
+    data={}
+    data['userid'] = json['userid']
+    result = func.events_joined_user_id(userid)
+    return jsonify(result=result)
+
+
+
+
 @app.route("/")
 def welcome():
     return render_template("welcome.html", title="Home")
@@ -73,6 +163,9 @@ def login():
     return render_template("user_login.html", title="Login", form=form)
 
 
+
+
+
 @app.route("/signup", methods=['GET','POST'])
 def signup():
     form = SignUpForm()
@@ -94,6 +187,7 @@ def signup():
     return render_template("user_signup.html", title="Sign Up", form=form)
 
 
+
 # Display venues for Zip Code
 @app.route("/zipsearch", methods=['GET','POST'])
 def zipsearch():
@@ -104,6 +198,8 @@ def zipsearch():
         # return redirect(url_for('venues', list=venuelist))
         return render_template('display_venues.html', list=venuelist)
     return render_template("zip_search.html", title="Search Game", form=form)
+
+
 
 
 # Display venues for Zip Code
@@ -279,6 +375,19 @@ def main():
     cnx.close()
 
     return str(current_time)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
