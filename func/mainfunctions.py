@@ -17,7 +17,7 @@ class MainFunctions():
 		else:
 			host = '127.0.0.1'
 			cnx = pymysql.connect(user='root', password='rootroot', host=host, db='soccerhoursdb')
-			
+
 		return cnx
 
 
@@ -33,7 +33,7 @@ class MainFunctions():
 			password=userdata['password']
 			zipcode=userdata['zipcode']
 			isadmin=userdata['isadmin']
-			
+
 			print(userdata)
 			now=datetime.datetime.now()
 			now=now.strftime('%Y-%m-%d')
@@ -84,7 +84,7 @@ class MainFunctions():
 			print(slotids)
 			query=' SELECT  e.event_date, e.event_name, v.venue_name, e.start_time, e.end_time, e.pk_event_id FROM events e join venue v on v.pk_venue_id=e.venue_id where e.venue_id in (SELECT distinct venue_id from slots where availability =\'U\' and slot_id in (' + ','.join((str(n) for n in slotids)) + ') and date=\'%s\')' % date
 			cursor.execute(query)
-			
+
 			eventlist=cursor.fetchall()
 			response=list()
 			for event in eventlist:
@@ -119,7 +119,7 @@ class MainFunctions():
 
 			query='SELECT distinct s.venue_id, v.venue_name from slots s join venue v on v.pk_venue_id=s.venue_id where venue_id not in (SELECT distinct venue_id from slots where availability =\'U\' and slot_id in (' + ','.join((str(n) for n in slotids)) + ') and date=\'%s\') UNION SELECT distinct v.pk_venue_id, v.venue_name from venue v where pk_venue_id not in (SELECT venue_id from slots)' % date
 			cursor.execute(query)
-			
+
 			venuesforslot=cursor.fetchall()
 			connection.close()
 			return venuesforslot
@@ -148,16 +148,16 @@ class MainFunctions():
 			else:
 				slotids=[]
 				slotids=c.get_slot_ids(int(starttime),int(endtime))
-				
-			cursor.execute(''' Select seq+1 from sequences where name='events' ''')	
+
+			cursor.execute(''' Select seq+1 from sequences where name='events' ''')
 			eventid=cursor.fetchone()[0]
-			
+
 			datestatus=c.check_valid_date(eventdate)
 			if(datestatus=='G' or datestatus=='T'):
 				if(datestatus=='T' and ~c.check_valid_time_today(starttime)):
 					print("For today time(Hour) needs to be greater than now. Please retry.")
 					return (0,"For today time(Hour) needs to be greater than now. Please retry.")
-				else:	
+				else:
 					# Check if entries exist in Slots
 					slotspresent = c.check_venue_slots(venueid, eventdate)
 					if(c.check_slots_booked(venueid, eventdate, slotids)):
@@ -170,7 +170,7 @@ class MainFunctions():
 							connection.commit()
 					for i in slotids:
 						cursor.execute(''' Update slots set availability='U', event_id=%s where venue_id=%s and slot_id=%s and date=%s''',[eventid,venueid,i,eventdate])
-					
+
 					cursor.execute(''' SELECT pk_user_id from user where username= %s ''',[username])
 					useridresult = cursor.fetchone()
 					if useridresult:
@@ -186,7 +186,7 @@ class MainFunctions():
 					return (1," ".join(["Slots booked for time:",str(starttime),":00  to ",str(endtime),":00  on date:",eventdate," for Venue ID:",str(venueid)]))
 			else:
 				print("The provided date has passed. Unable to book event for past date.")
-			
+
 			connection.close()
 
 
@@ -204,7 +204,7 @@ class MainFunctions():
 			if c.check_valid_event(eventid) is False:
 				print("Invalid EventID.")
 				return "Invalid Event."
-			
+
 			cursor.execute(''' Select event_capacity, members_joined from events where pk_event_id=%s ''', [eventid])
 			eventroom=cursor.fetchone()
 
@@ -238,7 +238,7 @@ class MainFunctions():
 			cursor.execute(query,zipcode)
 			venuesforzipcode=cursor.fetchall()
 			connection.close()
-			
+
 			if (venuesforzipcode is not None):
 				return venuesforzipcode
 			else:
@@ -271,7 +271,7 @@ class MainFunctions():
 			venuesforzipcode=cursor.fetchall()
 
 			return venuesforzipcode
-		
+
 
 
 	def display_events_for_venue_id(self, venue_id) :
@@ -288,7 +288,7 @@ class MainFunctions():
 				response.append(event[2])
 				response.append(str(event[3])+":00")
 				response.append(str(event[4])+":00")
-				
+
 			connection.close()
 			if (eventlist is not None):
 				return (1,eventlist)
@@ -313,7 +313,7 @@ class MainFunctions():
 				elem.append(str(event[3])+":00")
 				elem.append(str(event[4])+":00")
 				response.append(elem)
-				
+
 			connection.close()
 			if (eventlist is not None):
 				return (1,response)
@@ -353,7 +353,7 @@ class MainFunctions():
 		with connection.cursor() as cursor:
 			query='''UPDATE user SET user_status='I' WHERE pk_user_id=%s'''
 			cursor.execute(query, user_id)
-			connection.commit()			
+			connection.commit()
 			connection.close()
 			if cursor.rowcount==1:
 				return (1, "User with userid:"+user_id+" has been deactivated")
@@ -366,7 +366,7 @@ class MainFunctions():
 		with connection.cursor() as cursor:
 			query='''UPDATE user SET user_status='A' WHERE pk_user_id=%s'''
 			cursor.execute(query, user_id)
-			connection.commit()			
+			connection.commit()
 			connection.close()
 			if cursor.rowcount==1:
 				return (1, "User with userid:"+user_id+" has been activated")
@@ -378,7 +378,7 @@ class MainFunctions():
 		with connection.cursor() as cursor:
 			query='''UPDATE user SET admin_status='A' WHERE pk_user_id=%s'''
 			cursor.execute(query, user_id)
-			connection.commit()			
+			connection.commit()
 			connection.close()
 			if cursor.rowcount==1:
 				return (1, "User with userid:"+user_id+" has been activated")
@@ -395,7 +395,7 @@ class MainFunctions():
 			cursor.execute(''' SELECT slot_id FROM slots WHERE event_id=%s ''', event_id)
 			slotids = cursor.fetchall()
 			slot_list = [i[0] for i in slotids]
-			
+
 			print(slot_list)
 			qmark = "%s"
 			if isinstance(slot_list,list):
@@ -409,7 +409,3 @@ class MainFunctions():
 			connection.commit()
 			connection.close()
 			return (1,"Event has been deleted")
-
-
-
-

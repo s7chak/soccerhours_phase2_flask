@@ -1,11 +1,12 @@
 # [START gae_python37_cloudsql_mysql]
 import os
 
-from flask import Flask, render_template, url_for, redirect, flash, jsonify, request, session
+from flask import Flask, render_template, url_for, redirect, flash, jsonify, request, session, json
 from forms import SignUpForm, LoginForm, ZipSearchForm, VenueDateForm, StartEventForm, DateSearchForm
 import pymysql
 from func.mainfunctions import MainFunctions
 from func.commonfunctions import CommonFunctions
+from datetime import datetime
 
 
 db_user = os.environ.get('CLOUD_SQL_USERNAME')
@@ -18,42 +19,50 @@ app.config['SECRET_KEY'] = '294d86e9fd5e4b179261796459238269'
 
 
 # Routes for Android App
+# Routes for Android App
 @app.route("/applogin/<username>/<password>", methods=['GET'])
 def applogin(username, password):
-   func = MainFunctions()
-   userdata={}
-   print(username)
-   userdata['username']=username
-   userdata['password']=password
-   result = func.log_in(userdata)
-   return jsonify(
-       loggedin=result[0],
-       adminstatus=result[1],
-       status=result[2],
-       userid=result[3]
-   )
+    func = MainFunctions()
+    userdata={}
+    print(username)
+    userdata['username']=username
+    userdata['password']=password
 
+    result = func.log_in(userdata)
+    if(result[0] == 1):
+        session['userid'] = result[3]
+        print(str(session['userid'])+" set as signed in user")
+        return jsonify(
+            loggedin=result[0],
+            adminstatus=result[1],
+            status=result[2],
+            userid=result[3]
+        )
+    else:
+        return jsonify(loggedin=0)
 
 @app.route("/appsignup", methods=['POST'])
 def appsignup():
-   json = request.get_json()
-   if len(json['userName']) != 0:
-       func = MainFunctions()
-       userdata = {}
-       userdata['username'] = json['userName']
-       userdata['firstname'] = json['firstName']
-       userdata['lastname'] = json['lastName']
-       userdata['email'] = json['email']
-       userdata['password'] = json['password']
-       userdata['zipcode'] = json['zipCode']
-       userdata['isadmin'] = "N"
-       result = func.add_user(userdata)
-       return jsonify(result=result)
-   else:
-       return jsonify(result=9)
+
+    json = request.get_json()
+    if len(json['userName']) != 0:
+        func = MainFunctions()
+        userdata = {}
+        userdata['username'] = json['userName']
+        userdata['firstname'] = json['firstName']
+        userdata['lastname'] = json['lastName']
+        userdata['email'] = json['email']
+        userdata['password'] = json['password']
+        userdata['zipcode'] = json['zipCode']
+        userdata['isadmin'] = "N"
+
+        result = func.add_user(userdata)
+        return jsonify(result=result)
+    else:
+        return jsonify(result=9)
 
 
-# Route for android
+
 @app.route("/appzipsearch/<zipcode>", methods=['GET'])
 def appzipsearch(zipcode):
     func = MainFunctions()
@@ -61,38 +70,73 @@ def appzipsearch(zipcode):
     print(zipcode)
     userdata['zipcode']=zipcode
     result = func.display_events_for_zipcode(zipcode)
-    return jsonify(result=result)
+    eventlist = list()
+    for row in result:
+        a = dict()
+        a['eventname'] = row[0]
+        datestring = row[1]
+        dated=datetime.strftime(datestring, '%Y-%m-%d')
+        a['eventdate'] = dated
+        a['venue'] = row[2]
+        a['starttime'] = row[3]
+        a['endtime'] = row[4]
+        a['eventid'] = row[5]
+        a['spots'] = row[6]
+        eventlist.append(a)
+
+    s = json.dumps(eventlist)
 
 
+    # s = jsonify(result=result)
+    return s
 
-@app.route("/appstartevent", methods=['GET','POST'])
+
+@app.route("/appjoinevent/<eventid>/<userid>", methods=['GET'])
+def  appjoinevent(eventid, userid):
+    func = MainFunctions()
+    print(userid+":"+eventid)
+    result = func.user_joins_event(userid,eventid)
+    print(result)
+    return jsonify(message=result)
+
+@app.route("/appgetvenues", methods=['GET'])
+def appgetvenues():
+    func = CommonFunctions()
+    result = func.get_all_venues()
+    venuelist = list()
+    for row in result:
+        a = dict()
+        a['venueid'] = row[0]
+        a['venuename'] = row[1]
+        venuelist.append(a)
+    s = json.dumps(venuelist)
+
+    return s
+
+
+@app.route("/appstartevent", methods=['POST'])
 def appstartevent():
     json = request.get_json()
     mainfunc = MainFunctions()
     data={}
     data['venueid'] = json['venue']
-    data['username'] = json['usename']
+    data['username'] = json['username']
     data['eventname'] = json['eventname']
     data['eventdesc'] = json['eventdesc']
     data['eventdate'] = json['eventdate']
     data['starttime'] = json['starttime']
     data['endtime'] = json['endtime']
     data['eventcapacity'] = json['eventcapacity']
-    data['genderoption'] = json['genderoption']
+    data['genderoption'] = 'C'
     result = mainfunc.start_event(data)
-    return jsonify(result=result)
 
+    a = dict()
+    a['result'] = result[0]
+    a['message'] = result[1]
 
+    s = jsonify(a)
 
-@app.route("/appjoinevent", methods=['GET'])
-def  appjoinevent():
-    json = request.get_json()
-    func = MainFunctions()
-    data={}
-    data['userid'] = json['userid']
-    data['eventid'] = json['eventid']
-    result = func.user_joins_event(data)
-    return jsonify(result=result)
+    return s
 
 
 @app.route("/appjoinedgames/<userid>", methods=['GET'])
@@ -105,6 +149,9 @@ def appjoinedgames(userid):
 
     return jsonify(result[1])
 
+@app.route("/info")
+def info():
+    return render_template("info.html", title="Home")
 
 
 
@@ -118,7 +165,7 @@ def home():
         return render_template("home.html", admin=session['admin'])
     else:
         return redirect(url_for('login'))
-        
+
 @app.route("/admin")
 def admin():
     if 'admin' in session:
@@ -227,7 +274,7 @@ def startevent():
     venuelist = func.get_all_venues()
     print("Startevent Body")
     if form.validate_on_submit():
-        
+
         mainfunc = MainFunctions()
         data = {}
         data['venueid'] = request.form['venue']
@@ -242,7 +289,7 @@ def startevent():
 
         # result = mainfunc.get_availvenues_for_slot(data['starttime'],data['endtime'],data['eventdate'])
         # available_venue_list = [i[0] for i in result]
-        
+
 
         # if data['venueid'] not in available_venue_list:
         #     flash('The venue is not available for given slots on given date. Please try with a different slot or venue.', 'error')
@@ -394,6 +441,3 @@ def main():
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1',port=8080,debug=True)
-
-
-
