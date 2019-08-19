@@ -16,7 +16,7 @@ class MainFunctions():
 			cnx = pymysql.connect(user=db_user, password=db_password, unix_socket=unix_socket, db=db_name)
 		else:
 			host = '127.0.0.1'
-			cnx = pymysql.connect(user='root', password='root1234', host=host, db='soccerhoursdb')
+			cnx = pymysql.connect(user='root', password='rootroot', host=host, db='soccerhoursdb')
 			
 		return cnx
 
@@ -193,6 +193,7 @@ class MainFunctions():
 
 
 
+
 	def user_joins_event(self,userid, eventid) :
 		connection = self.db_connection()
 		with connection.cursor() as cursor:
@@ -319,6 +320,32 @@ class MainFunctions():
 			else:
 				return (0,"No events joined by this user.")
 
+
+	def events_joined_user_id_dict(self, user_id) :
+		connection = self.db_connection()
+		with connection.cursor() as cursor:
+			print(user_id)
+			query='SELECT  e.event_date, e.event_name, v.venue_name, e.start_time, e.end_time, e.pk_event_id FROM events e JOIN venue v ON e.venue_id=v.pk_venue_id  JOIN event_members em ON  e.pk_event_id=em.event_id WHERE em.user_id = %s'
+			cursor.execute(query, user_id)
+			eventlist=cursor.fetchall()
+			response=list()
+			for event in eventlist:
+				date_time = event[0].strftime("%Y-%m-%d")
+				elem={}
+				elem['eventdate']=(date_time)
+				elem['eventname']=event[1]
+				elem['venuename']=event[2]
+				elem['starttime']=str(event[3])+":00"
+				elem['endtime']=str(event[4])+":00"
+				print(elem)
+				response.append(elem)
+			print("---------")
+			print(response)
+			connection.close()
+			if (eventlist is not None):
+				return (1,response)
+			else:
+				return (0,"No events joined by this user.")
 
 
 	def remove_user(self, user_id):

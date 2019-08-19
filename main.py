@@ -95,14 +95,15 @@ def  appjoinevent():
     return jsonify(result=result)
 
 
-@app.route("/appjoinedgames", methods=['GET'])
-def appjoinedgames():
+@app.route("/appjoinedgames/<userid>", methods=['GET'])
+def appjoinedgames(userid):
     json = request.get_json()
     func = MainFunctions()
     data={}
-    data['userid'] = json['userid']
-    result = func.events_joined_user_id(userid)
-    return jsonify(result=result)
+    data['userid'] = userid
+    result = func.events_joined_user_id_dict(userid)
+
+    return jsonify(result[1])
 
 
 
