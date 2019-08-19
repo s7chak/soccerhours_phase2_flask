@@ -18,42 +18,50 @@ app.config['SECRET_KEY'] = '294d86e9fd5e4b179261796459238269'
 
 
 # Routes for Android App
+# Routes for Android App
 @app.route("/applogin/<username>/<password>", methods=['GET'])
 def applogin(username, password):
-   func = MainFunctions()
-   userdata={}
-   print(username)
-   userdata['username']=username
-   userdata['password']=password
-   result = func.log_in(userdata)
-   return jsonify(
-       loggedin=result[0],
-       adminstatus=result[1],
-       status=result[2],
-       userid=result[3]
-   )
+    func = MainFunctions()
+    userdata={}
+    print(username)
+    userdata['username']=username
+    userdata['password']=password
 
+    result = func.log_in(userdata)
+    if(result[0] == 1):
+        session['userid'] = result[3]
+        print(str(session['userid'])+" set as signed in user")
+        return jsonify(
+            loggedin=result[0],
+            adminstatus=result[1],
+            status=result[2],
+            userid=result[3]
+        )
+    else:
+        return jsonify(loggedin=0)
 
 @app.route("/appsignup", methods=['POST'])
 def appsignup():
-   json = request.get_json()
-   if len(json['userName']) != 0:
-       func = MainFunctions()
-       userdata = {}
-       userdata['username'] = json['userName']
-       userdata['firstname'] = json['firstName']
-       userdata['lastname'] = json['lastName']
-       userdata['email'] = json['email']
-       userdata['password'] = json['password']
-       userdata['zipcode'] = json['zipCode']
-       userdata['isadmin'] = "N"
-       result = func.add_user(userdata)
-       return jsonify(result=result)
-   else:
-       return jsonify(result=9)
+
+    json = request.get_json()
+    if len(json['userName']) != 0:
+        func = MainFunctions()
+        userdata = {}
+        userdata['username'] = json['userName']
+        userdata['firstname'] = json['firstName']
+        userdata['lastname'] = json['lastName']
+        userdata['email'] = json['email']
+        userdata['password'] = json['password']
+        userdata['zipcode'] = json['zipCode']
+        userdata['isadmin'] = "N"
+
+        result = func.add_user(userdata)
+        return jsonify(result=result)
+    else:
+        return jsonify(result=9)
+    
 
 
-# Route for android
 @app.route("/appzipsearch/<zipcode>", methods=['GET'])
 def appzipsearch(zipcode):
     func = MainFunctions()
@@ -61,49 +69,89 @@ def appzipsearch(zipcode):
     print(zipcode)
     userdata['zipcode']=zipcode
     result = func.display_events_for_zipcode(zipcode)
-    return jsonify(result=result)
+    eventlist = list()
+    for row in result:
+        a = dict()
+        a['eventname'] = row[0]
+        datestring = row[1]
+        dated=datetime.strftime(datestring, '%Y-%m-%d')
+        a['eventdate'] = dated
+        a['venue'] = row[2]
+        a['starttime'] = row[3]
+        a['endtime'] = row[4]
+        a['eventid'] = row[5]
+        a['spots'] = row[6]
+        eventlist.append(a)
+
+    s = json.dumps(eventlist)
+    
+
+    # s = jsonify(result=result)
+    return s
 
 
+@app.route("/appjoinevent/<eventid>/<userid>", methods=['GET'])
+def  appjoinevent(eventid, userid):
+    func = MainFunctions()
+    print(userid+":"+eventid)
+    result = func.user_joins_event(userid,eventid)
+    print(result)
+    return jsonify(message=result)
 
-@app.route("/appstartevent", methods=['GET','POST'])
+@app.route("/appgetvenues", methods=['GET'])
+def appgetvenues():
+    func = CommonFunctions()
+    result = func.get_all_venues()
+    venuelist = list()
+    for row in result:
+        a = dict()
+        a['venueid'] = row[0]
+        a['venuename'] = row[1]
+        venuelist.append(a)
+    s = json.dumps(venuelist)
+
+    return s
+
+
+@app.route("/appstartevent", methods=['POST'])
 def appstartevent():
     json = request.get_json()
     mainfunc = MainFunctions()
     data={}
     data['venueid'] = json['venue']
-    data['username'] = json['usename']
+    data['username'] = json['username']
     data['eventname'] = json['eventname']
     data['eventdesc'] = json['eventdesc']
     data['eventdate'] = json['eventdate']
     data['starttime'] = json['starttime']
     data['endtime'] = json['endtime']
     data['eventcapacity'] = json['eventcapacity']
-    data['genderoption'] = json['genderoption']
+    data['genderoption'] = 'C'
     result = mainfunc.start_event(data)
-    return jsonify(result=result)
+
+    a = dict()
+    a['result'] = result[0]
+    a['message'] = result[1]
+
+    s = jsonify(a)
+
+    return s
 
 
-
-@app.route("/appjoinevent", methods=['GET'])
-def  appjoinevent():
+@app.route("/appjoinedgames/<userid>", methods=['GET'])
+def appjoinedgames(userid):
     json = request.get_json()
     func = MainFunctions()
     data={}
-    data['userid'] = json['userid']
-    data['eventid'] = json['eventid']
-    result = func.user_joins_event(data)
-    return jsonify(result=result)
+    data['userid'] = userid
+    result = func.events_joined_user_id_dict(userid)
+    return jsonify(result[1])
 
 
-@app.route("/appjoinedgames", methods=['GET'])
-def appjoinedgames():
-    json = request.get_json()
-    func = MainFunctions()
-    data={}
-    data['userid'] = json['userid']
-    result = func.events_joined_user_id(userid)
-    return jsonify(result=result)
 
+@app.route("/info")
+def welcome():
+    return render_template("info.html", title="Home")
 
 
 
