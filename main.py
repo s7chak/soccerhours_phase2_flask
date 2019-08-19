@@ -150,7 +150,7 @@ def appjoinedgames(userid):
 
 
 @app.route("/info")
-def welcome():
+def info():
     return render_template("info.html", title="Home")
 
 
