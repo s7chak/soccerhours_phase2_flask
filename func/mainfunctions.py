@@ -312,7 +312,7 @@ class MainFunctions():
 				elem.append(str(event[3])+":00")
 				elem.append(str(event[4])+":00")
 				response.append(elem)
-				
+			
 			connection.close()
 			if (eventlist is not None):
 				return (1,response)
@@ -345,7 +345,7 @@ class MainFunctions():
 	                return (1,response)
 	            else:
 	                return (0,"No events joined by this user.")
-
+	                
 
 	def remove_user(self, user_id):
 		connection = self.db_connection()

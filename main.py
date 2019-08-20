@@ -149,11 +149,21 @@ def appjoinedgames(userid):
     return jsonify(result[1])
 
 
-
 @app.route("/info")
 def info():
-    return render_template("info.html", title="Home")
+    return render_template("info.html", title="Information", admin=session['admin'])
 
+@app.route("/about")
+def about():
+    return render_template("about.html", title="About", admin=session['admin'])
+
+@app.route("/how-to")
+def howto():
+    return render_template("howto.html", title="How-To Guide", admin=session['admin'])
+
+@app.route("/how-to-admin")
+def howtoadmin():
+    return render_template("howtoadmin.html", title="How-To Admin Guide", admin=session['admin'])
 
 
 @app.route("/")

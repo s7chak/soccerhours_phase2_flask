@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+
+    {% if title %}
+        <title>Soccer Hours - {{ title }}</title>
+    {% else %}
+        <title>Soccer Hours</title>
+    {% endif %}
+</head>
+	<header class="site-header">
+	  <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top" style="background-color='black'">
+	    <div class="container">
+	      <a class="navbar-brand mr-4" href="/">Soccer Hours - Information</a>
+	      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+	        <span class="navbar-toggler-icon"></span>
+	      </button>
+	      <div class="collapse navbar-collapse" id="navbarToggle">
+	        <div class="navbar-nav mr-auto">
+	          <a class="nav-item nav-link" href="/home">Home</a>
+	          <a class="nav-item nav-link" href="/how-to">How-To</a>
+              <a class="nav-item nav-link" href="/info">Info</a>
+              <a class="nav-item nav-link" href="/about">About</a>
+	        </div>
+	        <!-- Navbar Right Side -->
+	        <div class="navbar-nav"  style="background:'black'">
+	        	{% if (admin=='A') %}
+	        	<div>
+	        	<a class="nav-item nav-link" href="/admin">Admin</a></div>
+	        	{% endif %}
+	          <a class="nav-item nav-link" href="/login">Login</a>
+	          <a class="nav-item nav-link" href="/signup">Sign Up</a>
+	        </div>
+	      </div>
+	    </div>
+	  </nav>
+	</header>
+
+<br><br><br><br>
+<body style="height: 100%; background: url('/static/img/bg-common.jpg') no-repeat center center fixed; -webkit-background-size: cover;  -moz-background-size: cover; height: 100%;">
+<h3 align="center" style="color:'white'"><b>How-To Guide on Soccer Hours</b></h3>
+<br>
+{% block content %}
+<div align="center">
+<font color="white"><b></font></b><br>
+
+<img src="static/img/1welcome.png" height="400"/><br>
+<font color="white">The Welcome screen</font><br><br>
+
+<img src="static/img/2signup.png" height="400"/><br>
+<font color="white">1: Sign up with your details</font><br><br>
+
+<img src="static/img/2login.png" height="400"/><br>
+<font color="white">2: Log in with your username and password</font><br><br>
+
+
+<img src="static/img/3home.png" height="400"/><br>
+<font color="white"><b>Welcome to the Soccer Hours Home</b></font><br><br>
+
+
+
+<img src="static/img/5zipsearch.png" height="400"/><br>
+<font color="white">4.1: Find a Venue near you with Zip code</font><br><br>
+
+<img src="static/img/52zipvenues.png" height="400"/><br>
+<font color="white">4.2: Check out venues at the zip code</font><br><br>
+
+<img src="static/img/53events.png" height="400"/><br>
+<font color="white">4.3: Find games at each venue</font><br><br>
+
+
+
+<img src="static/img/4datesearch.png" height="400"/><br>
+<font color="white">5.1: Find a Game at particular time on a Date</font><br><br>
+
+
+<img src="static/img/4events.png" height="500"/><br>
+<font color="white">5.2: Join a game from list</font><br><br>
+<br><br><br>
+
+<font color="white"><b>Instructions to Start your own game</b></font><br><br>
+
+<img src="static/img/66startevent.png" height="500"/><br>
+<font color="white">Fill up below form with details of your event</font><br><br>
+
+
+<img src="static/img/3home.png" height="500"/><br>
+<font color="white"><b>Check your joined games by clicking on "Your Events"</b></font><br><br>
+<img src="static/img/77joinedgames.png" height="500"/><br>
+
+
+<font color="white"><b>Instructions to Start your own game</b></font><br><br>
+<img src="static/img/66startevent.png" height="500"/><br>
+<font color="white">Fill up above form with details of your event</font><br><br>
+
+
+
+
+
+</div>
+<br>
+{% endblock %}
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+</body>
+</div>
+</html>

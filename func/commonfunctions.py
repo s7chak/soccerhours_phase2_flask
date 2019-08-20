@@ -223,7 +223,7 @@ class CommonFunctions():
     def get_all_venues(self):
         connection = self.db_connection()
         with connection.cursor() as cursor:
-            cursor.execute(''' Select pk_venue_id, venue_name from venue ''')
+            cursor.execute(''' Select pk_venue_id, venue_name from venue order by pk_venue_id''')
             return cursor.fetchall()
 
     def get_all_users(self):
