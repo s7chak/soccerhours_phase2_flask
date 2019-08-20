@@ -60,7 +60,7 @@ def appsignup():
         return jsonify(result=result)
     else:
         return jsonify(result=9)
-    
+
 
 
 @app.route("/appzipsearch/<zipcode>", methods=['GET'])
@@ -85,7 +85,7 @@ def appzipsearch(zipcode):
         eventlist.append(a)
 
     s = json.dumps(eventlist)
-    
+
 
     # s = jsonify(result=result)
     return s
@@ -146,8 +146,8 @@ def appjoinedgames(userid):
     data={}
     data['userid'] = userid
     result = func.events_joined_user_id_dict(userid)
-    return jsonify(result[1])
 
+    return jsonify(result[1])
 
 @app.route("/info")
 def info():
@@ -176,7 +176,7 @@ def home():
         return render_template("home.html", admin=session['admin'])
     else:
         return redirect(url_for('login'))
-        
+
 @app.route("/admin")
 def admin():
     if 'admin' in session:
@@ -285,7 +285,7 @@ def startevent():
     venuelist = func.get_all_venues()
     print("Startevent Body")
     if form.validate_on_submit():
-        
+
         mainfunc = MainFunctions()
         data = {}
         data['venueid'] = request.form['venue']
@@ -300,7 +300,7 @@ def startevent():
 
         # result = mainfunc.get_availvenues_for_slot(data['starttime'],data['endtime'],data['eventdate'])
         # available_venue_list = [i[0] for i in result]
-        
+
 
         # if data['venueid'] not in available_venue_list:
         #     flash('The venue is not available for given slots on given date. Please try with a different slot or venue.', 'error')
@@ -452,6 +452,3 @@ def main():
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1',port=8080,debug=True)
-
-
-
